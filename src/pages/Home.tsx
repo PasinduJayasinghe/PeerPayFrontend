@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, TrendingUp, Shield, Clock, Star, ChevronRight, Users, Briefcase, Award, ArrowRight } from 'lucide-react';
+import { Search, TrendingUp, Shield, Clock, Star, ChevronRight, Users, Briefcase, Award, ArrowRight, Menu, X } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import PeerPayLogo from '../assets/images/PeerPayLogo.png';
 import BannerImage from '../assets/images/BannerImage.jpeg';
@@ -7,6 +7,7 @@ import BannerImage from '../assets/images/BannerImage.jpeg';
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('hire');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const categories = [
@@ -46,20 +47,68 @@ export default function Home() {
       {/* Navigation */}
       <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center items-center h-16 relative">
-            <img src={PeerPayLogo} alt="PeerPay Logo" className="h-10 w-auto cursor-pointer absolute left-0" onClick={() => navigate('/')} />
-            <div className="flex space-x-6">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <img src={PeerPayLogo} alt="PeerPay Logo" className="h-10 w-auto cursor-pointer" onClick={() => navigate('/')} />
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex space-x-6">
               <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors">Find Work</button>
               <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors">Find Talent</button>
               <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors">How it Works</button>
             </div>
-            <div className="flex items-center space-x-4 absolute right-0">
+            
+            {/* Desktop Auth Buttons */}
+            <div className="hidden md:flex items-center space-x-4">
               <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors" onClick={() => navigate("/login")}>Log In</button>
-              <button className="bg-[#8C00FF] text-white px-6 py-2 rounded-full hover:bg-[#7000CC] transition-all shadow-lg hover:shadow-xl" onClick={() => navigate("/admin/dashboard")}>
+              <button className="bg-[#8C00FF] text-white px-6 py-2 rounded-full hover:bg-[#7000CC] transition-all shadow-lg hover:shadow-xl" onClick={() => navigate("/login")}>
                 Sign Up
               </button>
             </div>
+
+            {/* Mobile Menu Button */}
+            <button 
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6 text-slate-700" />
+              ) : (
+                <Menu className="w-6 h-6 text-slate-700" />
+              )}
+            </button>
           </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden py-4 border-t border-slate-200">
+              <div className="flex flex-col space-y-4">
+                <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors text-left px-4 py-2 hover:bg-gray-50 rounded-lg">
+                  Find Work
+                </button>
+                <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors text-left px-4 py-2 hover:bg-gray-50 rounded-lg">
+                  Find Talent
+                </button>
+                <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors text-left px-4 py-2 hover:bg-gray-50 rounded-lg">
+                  How it Works
+                </button>
+                <div className="border-t border-slate-200 pt-4 px-4 space-y-3">
+                  <button 
+                    className="w-full text-slate-700 hover:text-[#8C00FF] font-medium transition-colors py-2 border border-slate-300 rounded-lg hover:border-[#8C00FF]" 
+                    onClick={() => navigate("/login")}
+                  >
+                    Log In
+                  </button>
+                  <button 
+                    className="w-full bg-[#8C00FF] text-white py-2 rounded-lg hover:bg-[#7000CC] transition-all shadow-lg" 
+                    onClick={() => navigate("/login")}
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
