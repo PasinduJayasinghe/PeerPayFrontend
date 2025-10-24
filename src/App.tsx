@@ -14,6 +14,7 @@ import StudentDashboard from './components/student/StudentDashboard.tsx'
 import AssignmentDashboard from './components/student/AssignmentDashboard.tsx'
 import JobBoard from './components/student/JobBoard.tsx'
 import JobDetails from './components/student/JobDetails.tsx'
+import StudentProfile from './components/student/StudentProfile.tsx'
 
 // // Employer Components
 import EmployerDashboard from './components/employer/EmployerDashboard.tsx'
@@ -47,6 +48,7 @@ const App: React.FC = () => {
           <Route path="/student/assignments" element={<AssignmentDashboard />} />
           <Route path="/student/jobs" element={<JobBoard />} />
           <Route path="/student/jobs/:id" element={<JobDetails />} />
+          <Route path="/student/profile" element={<StudentProfile />} />
 
 
           <Route path="/employer/dashboard" element={<EmployerDashboard />} />

@@ -7,6 +7,7 @@ export { default as messageService } from './messageService';
 export { default as ratingService } from './ratingService';
 export { default as paymentService } from './paymentService';
 export { default as adminService } from './adminService';
+export { default as studentService } from './studentService';
 export { default as dashboardService, useDashboardData, useUserStats } from './dashboardService';
 
 // Re-export api instance for custom calls
