@@ -11,9 +11,9 @@ import StudentOnboarding from './components/auth/StudentOnboarding.tsx'
 
 // // Student Components
 import StudentDashboard from './components/student/StudentDashboard.tsx'
-// import JobBoard from './components/student/JobBoard.tsx'
-// import JobDetails from './components/student/JobDetails.tsx'
-// import AssignmentDashboard from './components/student/AssignmentDashboard.tsx'
+import AssignmentDashboard from './components/student/AssignmentDashboard.tsx'
+import JobBoard from './components/student/JobBoard.tsx'
+import JobDetails from './components/student/JobDetails.tsx'
 
 // // Employer Components
 import EmployerDashboard from './components/employer/EmployerDashboard.tsx'
@@ -44,9 +44,9 @@ const App: React.FC = () => {
 
           
           <Route path="/student/dashboard" element={<StudentDashboard />} />
-          {/* <Route path="/student/jobs" element={<JobBoard />} />
+          <Route path="/student/assignments" element={<AssignmentDashboard />} />
+          <Route path="/student/jobs" element={<JobBoard />} />
           <Route path="/student/jobs/:id" element={<JobDetails />} />
-          <Route path="/student/assignments" element={<AssignmentDashboard />} /> */}
 
 
           <Route path="/employer/dashboard" element={<EmployerDashboard />} />
