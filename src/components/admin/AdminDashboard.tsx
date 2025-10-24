@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { adminService } from '../../services/adminService.ts';
+import PeerPayLogo from '../../assets/images/PeerPayLogo.png';
 
 
 interface DashboardStats {
@@ -212,9 +213,12 @@ const AdminDashboard: React.FC = () => {
       <header className="bg-white shadow-sm sticky top-0 z-10" style={{ backgroundColor: colors.darkNavy }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-              <p className="text-gray-300 text-sm mt-1">Platform overview and management</p>
+            <div className="flex items-center gap-4">
+              <img src={PeerPayLogo} alt="PeerPay Logo" className="h-12 w-auto" />
+              <div>
+                <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
+                <p className="text-gray-300 text-sm mt-1">Platform overview and management</p>
+              </div>
             </div>
             <button
               onClick={handleRefresh}

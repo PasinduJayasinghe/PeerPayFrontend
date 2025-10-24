@@ -118,12 +118,12 @@ class AuthService {
   }
 
   /**
-   * POST /api/auth/send-otp
+   * POST /api/otp/send-otp
    * Send OTP for email verification
    */
   async sendOtp(email: string): Promise<ApiResponse<void>> {
     try {
-      const response = await api.post<ApiResponse<void>>('/auth/send-otp', { email });
+      const response = await api.post<ApiResponse<void>>('/otp/send-otp', { email });
       return response.data;
     } catch (error) {
       console.error('Send OTP error:', error);
@@ -132,12 +132,12 @@ class AuthService {
   }
 
   /**
-   * POST /api/auth/verify-otp
+   * POST /api/otp/verify-otp
    * Verify OTP code
    */
   async verifyOtp(email: string, otp: string): Promise<ApiResponse<void>> {
     try {
-      const response = await api.post<ApiResponse<void>>('/auth/verify-otp', { email, otp });
+      const response = await api.post<ApiResponse<void>>('/otp/verify-otp', { email, otp });
       return response.data;
     } catch (error) {
       console.error('Verify OTP error:', error);

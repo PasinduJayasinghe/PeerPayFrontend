@@ -100,16 +100,11 @@ const StudentOnboarding: React.FC = () => {
 
     setIsVerifying(true);
     try {
-      // TODO: Replace with actual API call
-      // await authService.sendOtp(email);
-      
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+      await authService.sendOtp(email);
       toast.success(`OTP sent to ${email}`);
       setOtpSent(true);
-    } catch (error) {
-      toast.error('Failed to send OTP');
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to send OTP');
       console.error(error);
     } finally {
       setIsVerifying(false);
@@ -125,15 +120,11 @@ const StudentOnboarding: React.FC = () => {
 
     setIsVerifying(true);
     try {
-      // TODO: Replace with actual API call
-      // await authService.verifyOtp(email, otp);
-      
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+      await authService.verifyOtp(email, otp);
       toast.success('Email verified successfully!');
       setCurrentStep(3);
-    } catch (error) {
-      toast.error('Invalid OTP');
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Invalid OTP');
       console.error(error);
     } finally {
       setIsVerifying(false);

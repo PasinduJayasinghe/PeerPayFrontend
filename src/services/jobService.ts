@@ -11,12 +11,17 @@ import type {
 
 interface CreateJobDto {
   employerId: string;
+  categoryId: string;
   title: string;
   description: string;
-  skillsRequired: string[];
-  budget: number;
+  payAmount: number;
+  payType: string;
+  durationDays: number;
+  requiredSkills: string[];
   deadline: string;
-  categoryId?: string;
+  location: string;
+  jobType: string;
+  maxApplicants: number;
 }
 
 interface UpdateJobDto {
@@ -33,8 +38,7 @@ interface CreateJobApplicationDto {
   jobId: string;
   studentId: string;
   coverLetter: string;
-  proposedRate: number;
-  estimatedDuration?: string;
+  attachments?: string[];
 }
 
 interface UpdateApplicationStatusDto {
@@ -188,12 +192,12 @@ class JobService {
   // ============ JOB APPLICATIONS ============
 
   /**
-   * POST /api/job/{jobId}/apply
+   * POST /api/jobapplication/apply
    * Apply for a job
    */
   async applyForJob(applicationData: CreateJobApplicationDto): Promise<JobApplication> {
     try {
-      const response = await api.post<JobApplication>(`${this.BASE_URL}/${applicationData.jobId}/apply`, applicationData);
+      const response = await api.post<JobApplication>('/jobapplication/apply', applicationData);
       return response.data;
     } catch (error) {
       console.error('Apply for job error:', error);
@@ -202,12 +206,12 @@ class JobService {
   }
 
   /**
-   * GET /api/job/{jobId}/applications
+   * GET /api/jobapplication/job/{jobId}
    * Get applications for a job
    */
   async getJobApplications(jobId: string): Promise<JobApplication[]> {
     try {
-      const response = await api.get<JobApplication[]>(`${this.BASE_URL}/${jobId}/applications`);
+      const response = await api.get<JobApplication[]>(`/jobapplication/job/${jobId}`);
       return response.data;
     } catch (error) {
       console.error('Get job applications error:', error);
@@ -216,12 +220,12 @@ class JobService {
   }
 
   /**
-   * GET /api/job/applications/student/{studentId}
+   * GET /api/jobapplication/student/{studentId}
    * Get applications by student
    */
   async getStudentApplications(studentId: string): Promise<JobApplication[]> {
     try {
-      const response = await api.get<JobApplication[]>(`${this.BASE_URL}/applications/student/${studentId}`);
+      const response = await api.get<JobApplication[]>(`/jobapplication/student/${studentId}`);
       return response.data;
     } catch (error) {
       console.error('Get student applications error:', error);
@@ -230,12 +234,12 @@ class JobService {
   }
 
   /**
-   * PUT /api/job/applications/{applicationId}/status
+   * PUT /api/jobapplication/{applicationId}/status
    * Update application status
    */
   async updateApplicationStatus(statusData: UpdateApplicationStatusDto): Promise<JobApplication> {
     try {
-      const response = await api.put<JobApplication>(`${this.BASE_URL}/applications/${statusData.applicationId}/status`, statusData);
+      const response = await api.put<JobApplication>(`/jobapplication/${statusData.applicationId}/status`, statusData);
       return response.data;
     } catch (error) {
       console.error('Update application status error:', error);

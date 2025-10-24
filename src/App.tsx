@@ -17,7 +17,7 @@ import StudentDashboard from './components/student/StudentDashboard.tsx'
 
 // // Employer Components
 import EmployerDashboard from './components/employer/EmployerDashboard.tsx'
-// import PostJob from './components/employer/PostJob.tsx'
+import PostJob from './components/employer/PostJob.tsx'
 // import ManageApplications from './components/employer/ManageApplications.tsx'
 
 // // Admin Components             
@@ -50,8 +50,8 @@ const App: React.FC = () => {
 
 
           <Route path="/employer/dashboard" element={<EmployerDashboard />} />
-          {/* <Route path="/employer/post-job" element={<PostJob />} />
-          <Route path="/employer/applications" element={<ManageApplications />} /> */}
+          <Route path="/employer/jobs/create" element={<PostJob />} />
+          {/* <Route path="/employer/applications" element={<ManageApplications />} /> */}
 
 
            <Route path="/admin/dashboard" element={<AdminDashboard />} />

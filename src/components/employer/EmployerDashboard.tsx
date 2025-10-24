@@ -17,6 +17,7 @@ import { useDashboardData } from '../../services/dashboardService';
 import { notificationService } from '../../services';
 import { toast } from 'sonner';
 import type { Job } from '../../types';
+import PeerPayLogo from '../../assets/images/PeerPayLogo.png';
 
 const EmployerDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ const EmployerDashboard: React.FC = () => {
       case 'Closed':
         return 'bg-gray-100 text-gray-800';
       case 'Completed':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-yellow-100 text-yellow-800';
     }
@@ -66,7 +67,7 @@ const EmployerDashboard: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8C00FF] mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading dashboard...</p>
         </div>
       </div>
@@ -79,14 +80,17 @@ const EmployerDashboard: React.FC = () => {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Employer Dashboard</h1>
-              <p className="text-sm text-gray-600">Welcome back, {user?.name}!</p>
+            <div className="flex items-center gap-4">
+              <img src={PeerPayLogo} alt="PeerPay Logo" className="h-12 w-auto" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Employer Dashboard</h1>
+                <p className="text-sm text-gray-600">Welcome back, {user?.name}!</p>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => navigate('/employer/notifications')}
-                className="relative p-2 text-gray-600 hover:text-blue-600 transition"
+                className="relative p-2 text-gray-600 hover:text-[#8C00FF] transition"
               >
                 <Bell className="w-6 h-6" />
                 {unreadCount > 0 && (
@@ -97,7 +101,7 @@ const EmployerDashboard: React.FC = () => {
               </button>
               <button 
                 onClick={() => navigate('/employer/profile')}
-                className="p-2 text-gray-600 hover:text-blue-600 transition"
+                className="p-2 text-gray-600 hover:text-[#8C00FF] transition"
               >
                 <User className="w-6 h-6" />
               </button>
@@ -174,7 +178,7 @@ const EmployerDashboard: React.FC = () => {
                   <h2 className="text-xl font-bold text-gray-900">My Job Posts</h2>
                   <button
                     onClick={() => navigate('/employer/jobs/create')}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#8C00FF] text-white rounded-lg hover:bg-[#7000CC] transition text-sm"
                   >
                     <Plus className="w-4 h-4" />
                     Post New Job
@@ -196,7 +200,7 @@ const EmployerDashboard: React.FC = () => {
                         <div className="flex items-center gap-4 text-sm text-gray-500">
                           <span className="flex items-center gap-1">
                             <DollarSign className="w-4 h-4" />
-                            ${job.budget}
+                            ${job.payAmount}
                           </span>
                           <span className="flex items-center gap-1">
                             <Users className="w-4 h-4" />
@@ -264,7 +268,7 @@ const EmployerDashboard: React.FC = () => {
                 </button>
                 <button
                   onClick={() => navigate('/employer/jobs')}
-                  className="w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium"
+                  className="w-full px-4 py-3 bg-[#8C00FF] text-white rounded-lg hover:bg-[#7000CC] transition text-sm font-medium"
                 >
                   Manage Jobs
                 </button>

@@ -16,6 +16,7 @@ import { useDashboardData } from '../../services/dashboardService';
 import { jobService, notificationService } from '../../services';
 import { toast } from 'sonner';
 import type { Job, JobApplication } from '../../types';
+import PeerPayLogo from '../../assets/images/PeerPayLogo.png';
 
 const StudentDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -50,12 +51,17 @@ const StudentDashboard: React.FC = () => {
 
   const getApplicationStatusColor = (status: string) => {
     switch (status) {
-      case 'Pending':
+      case 'Submitted':
+      case 'UnderReview':
         return 'bg-yellow-100 text-yellow-800';
-      case 'Accepted':
+      case 'Shortlisted':
+        return 'bg-blue-100 text-blue-800';
+      case 'Selected':
         return 'bg-green-100 text-green-800';
       case 'Rejected':
         return 'bg-red-100 text-red-800';
+      case 'Withdrawn':
+        return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -65,7 +71,7 @@ const StudentDashboard: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8C00FF] mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading dashboard...</p>
         </div>
       </div>
@@ -78,14 +84,17 @@ const StudentDashboard: React.FC = () => {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Student Dashboard</h1>
-              <p className="text-sm text-gray-600">Welcome back, {user?.name}!</p>
+            <div className="flex items-center gap-4">
+              <img src={PeerPayLogo} alt="PeerPay Logo" className="h-12 w-auto" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Student Dashboard</h1>
+                <p className="text-sm text-gray-600">Welcome back, {user?.name}!</p>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => navigate('/student/notifications')}
-                className="relative p-2 text-gray-600 hover:text-blue-600 transition"
+                className="relative p-2 text-gray-600 hover:text-[#8C00FF] transition"
               >
                 <Bell className="w-6 h-6" />
                 {unreadCount > 0 && (
@@ -96,7 +105,7 @@ const StudentDashboard: React.FC = () => {
               </button>
               <button 
                 onClick={() => navigate('/student/profile')}
-                className="p-2 text-gray-600 hover:text-blue-600 transition"
+                className="p-2 text-gray-600 hover:text-[#8C00FF] transition"
               >
                 <User className="w-6 h-6" />
               </button>
@@ -123,16 +132,16 @@ const StudentDashboard: React.FC = () => {
                   {dashboardData?.applications?.length || 0}
                 </p>
               </div>
-              <Briefcase className="w-10 h-10 text-blue-600" />
+              <Briefcase className="w-10 h-10 text-[#8C00FF]" />
             </div>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Pending</p>
+                <p className="text-sm text-gray-600">Submitted</p>
                 <p className="text-2xl font-bold text-yellow-600">
-                  {dashboardData?.applications?.filter((app: JobApplication) => app.status === 'Pending').length || 0}
+                  {dashboardData?.applications?.filter((app: JobApplication) => app.status === 'Submitted' || app.status === 'UnderReview').length || 0}
                 </p>
               </div>
               <Clock className="w-10 h-10 text-yellow-600" />
@@ -142,9 +151,9 @@ const StudentDashboard: React.FC = () => {
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Accepted</p>
+                <p className="text-sm text-gray-600">Selected</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {dashboardData?.applications?.filter((app: JobApplication) => app.status === 'Accepted').length || 0}
+                  {dashboardData?.applications?.filter((app: JobApplication) => app.status === 'Selected').length || 0}
                 </p>
               </div>
               <TrendingUp className="w-10 h-10 text-green-600" />
@@ -170,10 +179,10 @@ const StudentDashboard: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-6 border-b border-gray-200">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold text-gray-900">Available Jobs</h2>
-                  <button
+                  <h2 className="text-xl font-bold text-gray-900">Recent Jobs</h2>
+                  <button 
                     onClick={() => navigate('/student/jobs')}
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    className="text-[#8C00FF] hover:text-[#7000CC] text-sm font-medium"
                   >
                     View All
                   </button>
@@ -189,7 +198,7 @@ const StudentDashboard: React.FC = () => {
                         <div className="flex items-center gap-4 text-sm text-gray-500">
                           <span className="flex items-center gap-1">
                             <DollarSign className="w-4 h-4" />
-                            ${job.budget}
+                            ${job.payAmount}
                           </span>
                           <span className="flex items-center gap-1">
                             <Clock className="w-4 h-4" />
@@ -197,8 +206,8 @@ const StudentDashboard: React.FC = () => {
                           </span>
                         </div>
                       </div>
-                      <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
-                        Apply
+                      <button className="px-4 py-2 bg-[#8C00FF] text-white rounded-lg hover:bg-[#7000CC] transition text-sm">
+                        Apply Now
                       </button>
                     </div>
                   </div>
@@ -243,7 +252,7 @@ const StudentDashboard: React.FC = () => {
               <div className="p-6 space-y-3">
                 <button
                   onClick={() => navigate('/student/jobs')}
-                  className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                  className="w-full px-4 py-3 bg-[#8C00FF] text-white rounded-lg hover:bg-[#7000CC] transition text-sm font-medium"
                 >
                   Browse Jobs
                 </button>

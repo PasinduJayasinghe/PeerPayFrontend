@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Search, TrendingUp, Shield, Clock, Star, ChevronRight, Users, Briefcase, Award, ArrowRight } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import PeerPayLogo from '../assets/images/PeerPayLogo.png';
+import BannerImage from '../assets/images/BannerImage.jpeg';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,20 +46,16 @@ export default function Home() {
       {/* Navigation */}
       <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                PeerPay
-              </h1>
-              <div className="hidden md:flex space-x-6">
-                <button className="text-slate-700 hover:text-blue-600 font-medium transition-colors">Find Work</button>
-                <button className="text-slate-700 hover:text-blue-600 font-medium transition-colors">Find Talent</button>
-                <button className="text-slate-700 hover:text-blue-600 font-medium transition-colors">How it Works</button>
-              </div>
+          <div className="flex justify-center items-center h-16 relative">
+            <img src={PeerPayLogo} alt="PeerPay Logo" className="h-10 w-auto cursor-pointer absolute left-0" onClick={() => navigate('/')} />
+            <div className="flex space-x-6">
+              <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors">Find Work</button>
+              <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors">Find Talent</button>
+              <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors">How it Works</button>
             </div>
-            <div className="flex items-center space-x-4">
-              <button className="text-slate-700 hover:text-blue-600 font-medium transition-colors" onClick={() => navigate("/login")}>Log In</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl" onClick={() => navigate("/admin/dashboard")}>
+            <div className="flex items-center space-x-4 absolute right-0">
+              <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors" onClick={() => navigate("/login")}>Log In</button>
+              <button className="bg-[#8C00FF] text-white px-6 py-2 rounded-full hover:bg-[#7000CC] transition-all shadow-lg hover:shadow-xl" onClick={() => navigate("/admin/dashboard")}>
                 Sign Up
               </button>
             </div>
@@ -66,14 +64,19 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 text-white py-20">
+      <section className="relative overflow-hidden text-white py-20" style={{
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${BannerImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
         <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:32px_32px]"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
               Find the Perfect Freelancer or Your Next Job
             </h1>
-            <p className="text-xl text-blue-100 mb-10">
+            <p className="text-xl text-gray-100 mb-10">
               Connect with talented professionals worldwide. Post jobs, hire talent, or find work that matches your skills.
             </p>
 
@@ -83,7 +86,7 @@ export default function Home() {
                 <button
                   onClick={() => setActiveTab('hire')}
                   className={`px-8 py-3 rounded-full font-medium transition-all ${
-                    activeTab === 'hire' ? 'bg-white text-blue-600 shadow-lg' : 'text-white hover:bg-white/20'
+                    activeTab === 'hire' ? 'bg-white text-[#8C00FF] shadow-lg' : 'text-white hover:bg-white/20'
                   }`}
                 >
                   Hire Talent
@@ -91,7 +94,7 @@ export default function Home() {
                 <button
                   onClick={() => setActiveTab('work')}
                   className={`px-8 py-3 rounded-full font-medium transition-all ${
-                    activeTab === 'work' ? 'bg-white text-blue-600 shadow-lg' : 'text-white hover:bg-white/20'
+                    activeTab === 'work' ? 'bg-white text-[#8C00FF] shadow-lg' : 'text-white hover:bg-white/20'
                   }`}
                 >
                   Find Work
@@ -110,12 +113,12 @@ export default function Home() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 px-4 py-3 text-slate-800 outline-none text-lg"
                 />
-                <button className="bg-blue-600 text-white px-8 py-3 rounded-full hover:bg-blue-700 transition-all font-medium shadow-lg">
+                <button className="bg-[#8C00FF] text-white px-8 py-3 rounded-full hover:bg-[#7000CC] transition-all font-medium shadow-lg">
                   Search
                 </button>
               </div>
               <div className="mt-4 flex flex-wrap justify-center gap-2">
-                <span className="text-blue-100 text-sm">Popular:</span>
+                <span className="text-gray-100 text-sm">Popular:</span>
                 {['Web Development', 'Logo Design', 'Content Writing', 'Mobile Apps'].map((tag) => (
                   <button key={tag} className="bg-white/20 hover:bg-white/30 px-4 py-1 rounded-full text-sm transition-all">
                     {tag}
@@ -134,8 +137,8 @@ export default function Home() {
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="flex justify-center mb-3">
-                  <div className="bg-blue-50 p-3 rounded-full">
-                    <stat.icon className="text-blue-600" size={28} />
+                  <div className="bg-purple-50 p-3 rounded-full">
+                    <stat.icon className="text-[#8C00FF]" size={28} />
                   </div>
                 </div>
                 <div className="text-3xl font-bold text-slate-800">{stat.value}</div>
@@ -157,10 +160,10 @@ export default function Home() {
             {categories.map((category, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl p-6 border border-slate-200 hover:border-blue-300 hover:shadow-xl transition-all cursor-pointer group"
+                className="bg-white rounded-2xl p-6 border border-slate-200 hover:border-[#8C00FF] hover:shadow-xl transition-all cursor-pointer group"
               >
                 <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{category.icon}</div>
-                <h3 className="font-semibold text-slate-800 mb-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="font-semibold text-slate-800 mb-2 group-hover:text-[#8C00FF] transition-colors">
                   {category.name}
                 </h3>
                 <p className="text-slate-500 text-sm">{category.jobs} jobs available</p>
@@ -178,7 +181,7 @@ export default function Home() {
               <h2 className="text-4xl font-bold text-slate-800 mb-2">Top Rated Freelancers</h2>
               <p className="text-slate-600 text-lg">Hire the best talent for your projects</p>
             </div>
-            <button className="flex items-center text-blue-600 hover:text-blue-700 font-medium">
+            <button className="flex items-center text-[#8C00FF] hover:text-[#7000CC] font-medium">
               View All <ChevronRight size={20} />
             </button>
           </div>
@@ -196,7 +199,7 @@ export default function Home() {
                 <p className="text-slate-600 text-sm mb-4">{freelancer.role}</p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {freelancer.skills.map((skill, i) => (
-                    <span key={i} className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-medium">
+                    <span key={i} className="bg-purple-50 text-[#8C00FF] px-3 py-1 rounded-full text-xs font-medium">
                       {skill}
                     </span>
                   ))}
@@ -206,7 +209,7 @@ export default function Home() {
                     <div className="text-2xl font-bold text-slate-800">${freelancer.hourlyRate}</div>
                     <div className="text-xs text-slate-500">per hour</div>
                   </div>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all text-sm font-medium">
+                  <button className="bg-[#8C00FF] text-white px-4 py-2 rounded-lg hover:bg-[#7000CC] transition-all text-sm font-medium">
                     Hire Now
                   </button>
                 </div>
@@ -224,7 +227,7 @@ export default function Home() {
               <h2 className="text-4xl font-bold text-slate-800 mb-2">Featured Jobs</h2>
               <p className="text-slate-600 text-lg">Start applying to top opportunities</p>
             </div>
-            <button className="flex items-center text-blue-600 hover:text-blue-700 font-medium">
+            <button className="flex items-center text-[#8C00FF] hover:text-[#7000CC] font-medium">
               View All <ChevronRight size={20} />
             </button>
           </div>
@@ -247,18 +250,18 @@ export default function Home() {
                 <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
                   <div>
                     <div className="text-slate-500 mb-1">Budget</div>
-                    <div className="font-semibold text-slate-800">{job.budget}</div>
+                    <div className="font-semibold text-slate-800">${job.payAmount}</div>
                   </div>
                   <div>
                     <div className="text-slate-500 mb-1">Duration</div>
-                    <div className="font-semibold text-slate-800">{job.duration}</div>
+                    <div className="font-semibold text-slate-800">{job.durationDays} days</div>
                   </div>
                   <div>
-                    <div className="text-slate-500 mb-1">Proposals</div>
-                    <div className="font-semibold text-slate-800">{job.proposals}</div>
+                    <div className="text-slate-500 mb-1">Applications</div>
+                    <div className="font-semibold text-slate-800">{job.applicationCount || 0}</div>
                   </div>
                 </div>
-                <button className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-all font-medium flex items-center justify-center group">
+                <button className="w-full bg-[#8C00FF] text-white py-3 rounded-lg hover:bg-[#7000CC] transition-all font-medium flex items-center justify-center group">
                   Apply Now
                   <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
                 </button>
@@ -269,7 +272,7 @@ export default function Home() {
       </section>
 
       {/* Trust & Safety Section */}
-      <section className="py-16 bg-gradient-to-br from-blue-50 to-cyan-50">
+      <section className="py-16 bg-gradient-to-br from-purple-50 to-yellow-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-slate-800 mb-4">Why Choose PeerPay?</h2>
@@ -277,8 +280,8 @@ export default function Home() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white rounded-2xl p-8 shadow-lg">
-              <div className="bg-blue-100 w-14 h-14 rounded-full flex items-center justify-center mb-6">
-                <Shield className="text-blue-600" size={28} />
+              <div className="bg-purple-100 w-14 h-14 rounded-full flex items-center justify-center mb-6">
+                <Shield className="text-[#8C00FF]" size={28} />
               </div>
               <h3 className="text-xl font-bold text-slate-800 mb-3">Secure Payments</h3>
               <p className="text-slate-600">
@@ -308,17 +311,17 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
+      <section className="py-20 bg-gradient-to-r from-[#8C00FF] to-[#7000CC] text-white">
         <div className="max-w-4xl mx-auto text-center px-4">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-gray-100 mb-8">
             Join thousands of professionals who trust PeerPay for their freelance needs
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-blue-600 px-8 py-4 rounded-full hover:bg-blue-50 transition-all font-semibold text-lg shadow-xl">
+            <button className="bg-white text-[#8C00FF] px-8 py-4 rounded-full hover:bg-gray-50 transition-all font-semibold text-lg shadow-xl">
               Post a Job
             </button>
-            <button className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full hover:bg-white hover:text-blue-600 transition-all font-semibold text-lg">
+            <button className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full hover:bg-white hover:text-[#8C00FF] transition-all font-semibold text-lg">
               Find Work
             </button>
           </div>
@@ -330,7 +333,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#8C00FF] to-[#FFC400] bg-clip-text text-transparent">
                 PeerPay
               </h3>
               <p className="text-slate-400">Connecting talent with opportunity worldwide.</p>

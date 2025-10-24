@@ -158,9 +158,12 @@ const LoginForm: React.FC = () => {
           <div className="text-center space-y-2 pt-4 border-t">
             <p className="text-gray-600 text-sm">
               Don't have an account?{' '}
-              <a href="#" className="text-blue-600 font-bold hover:underline">
+              <button 
+                onClick={() => navigate(`/register/${userType}`)}
+                className="text-blue-600 font-bold hover:underline"
+              >
                 Register here
-              </a>
+              </button>
             </p>
             <p className="text-gray-600 text-sm">
               <a href="#" className="text-blue-600 hover:underline">

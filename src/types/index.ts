@@ -100,33 +100,49 @@ export interface UserResponseDto {
 }
 
 // Job related types
-export type JobStatus = 'Open' | 'InProgress' | 'UnderReview' | 'Completed' | 'Cancelled';
-export type ApplicationStatus = 'Pending' | 'Shortlisted' | 'Accepted' | 'Rejected' | 'Withdrawn';
+export type JobStatus = 'Active' | 'Closed' | 'Completed' | 'Cancelled';
+export type ApplicationStatus = 'Submitted' | 'UnderReview' | 'Shortlisted' | 'Selected' | 'Rejected' | 'Withdrawn';
+export type PayType = 'Hourly' | 'Daily' | 'Weekly' | 'Monthly' | 'Fixed';
+export type JobType = 'FullTime' | 'PartTime' | 'ProjectBased' | 'Freelance';
 
 export interface Job {
   jobId: string;
   id: string; // Add alias for convenience
   employerId: string;
+  categoryId: string;
   title: string;
   description: string;
-  skillsRequired: string[];
-  budget: number;
+  payAmount: number;
+  payType: PayType;
+  durationDays: number;
+  requiredSkills: string[];
   deadline: string;
   status: JobStatus;
+  location: string;
+  jobType: JobType;
+  maxApplicants: number;
   applicationCount?: number; // Add for dashboard stats
-  createdAt: string;
-  updatedAt: string;
+  postedDate: string;
 }
 
 export interface JobApplication {
-  applicationId: string;
-  id: string; // Add alias for convenience
+  id: string;
   jobId: string;
+  jobTitle?: string;
+  employerName?: string;
   studentId: string;
-  coverLetter: string;
-  proposedRate: number;
-  status: ApplicationStatus;
+  studentName?: string;
+  studentEmail?: string;
+  studentPhone?: string;
+  university?: string;
+  course?: string;
+  yearOfStudy?: number;
   appliedAt: string;
+  status: ApplicationStatus;
+  coverLetter: string;
+  attachments?: string[];
+  statusUpdatedAt?: string;
+  employerNotes?: string;
 }
 
 // Notification types
