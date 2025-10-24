@@ -46,13 +46,39 @@ const LoginForm: React.FC = () => {
     );
 
     if (result) {
+      // Debug: Log the result to see what userType is being returned
+      console.log('Login result:', result);
+      console.log('User type:', result.user.userType);
+      console.log('User type typeof:', typeof result.user.userType);
+      
+      // Map numeric userType to string if needed
+      let userTypeString: 'Student' | 'Employer' | 'Admin';
+      if (typeof result.user.userType === 'number') {
+        // Backend is returning enum as number (1=Student, 2=Employer, 3=Admin)
+        const userTypeMap: Record<number, 'Student' | 'Employer' | 'Admin'> = {
+          1: 'Student',
+          2: 'Employer',
+          3: 'Admin'
+        };
+        userTypeString = userTypeMap[result.user.userType as unknown as number] || 'Student';
+      } else {
+        userTypeString = result.user.userType as 'Student' | 'Employer' | 'Admin';
+      }
+      
+      // Ensure user.id is set (use userId as fallback)
+      const userWithId = {
+        ...result.user,
+        id: result.user.id || result.user.userId,
+        userType: userTypeString
+      };
+      
       // Store auth data using the store's setAuth method
-      setAuth(result.token, result.user, result.user.userType);
+      setAuth(result.token, userWithId, userTypeString);
       
       // Navigate based on user type
-      if (result.user.userType === 'Student') {
+      if (userTypeString === 'Student') {
         navigate('/student/dashboard');
-      } else if (result.user.userType === 'Employer') {
+      } else if (userTypeString === 'Employer') {
         navigate('/employer/dashboard');
       } else {
         navigate('/admin/dashboard');
