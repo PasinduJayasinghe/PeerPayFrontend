@@ -3,6 +3,7 @@ export { default as authService } from './authService';
 export { default as userService } from './userService';
 export { default as jobService } from './jobService';
 export { jobCategoryService } from './jobCategoryService';
+export { geminiChatService } from './geminiChatService';
 export { default as notificationService } from './notificationService';
 export { default as messageService } from './messageService';
 export { default as ratingService } from './ratingService';

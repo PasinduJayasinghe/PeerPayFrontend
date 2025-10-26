@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Briefcase, DollarSign, Calendar, MapPin, Clock, Users, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import jobService from '../../services/jobService';
+import { jobCategoryService } from '../../services';
+import type { JobCategory } from '../../services/jobCategoryService';
 import { useAuthStore } from '../../store/authStore';
 import type { PayType, JobType } from '../../types';
 
@@ -24,6 +26,8 @@ const PostJob: React.FC = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<JobCategory[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
   const [formData, setFormData] = useState<JobFormData>({
     title: '',
@@ -38,6 +42,37 @@ const PostJob: React.FC = () => {
     jobType: 'ProjectBased',
     maxApplicants: '10',
   });
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      setLoadingCategories(true);
+      const data = await jobCategoryService.getAllCategories();
+      console.log('Fetched categories:', data);
+      
+      if (Array.isArray(data)) {
+        const activeCategories = data.filter(cat => cat.isActive);
+        console.log('Active categories:', activeCategories);
+        setCategories(activeCategories);
+        
+        if (activeCategories.length === 0) {
+          toast.warning('No active job categories available');
+        }
+      } else {
+        console.error('Categories data is not an array:', data);
+        toast.error('Invalid categories data format');
+      }
+    } catch (error: any) {
+      console.error('Failed to fetch categories:', error);
+      console.error('Error details:', error.response?.data);
+      toast.error('Failed to load job categories. Please refresh the page.');
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -204,25 +239,29 @@ const PostJob: React.FC = () => {
               Category <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" />
               <select
                 name="categoryId"
                 value={formData.categoryId}
                 onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8C00FF] focus:border-transparent appearance-none"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8C00FF] focus:border-transparent"
                 required
+                disabled={loadingCategories}
               >
-                <option value="">Select a category</option>
-                <option value="cat1">Web Development</option>
-                <option value="cat2">Mobile Development</option>
-                <option value="cat3">Graphic Design</option>
-                <option value="cat4">Content Writing</option>
-                <option value="cat5">Data Entry</option>
-                <option value="cat6">Digital Marketing</option>
-                <option value="cat7">Video Editing</option>
-                <option value="cat8">Other</option>
+                <option value="">{loadingCategories ? 'Loading categories...' : 'Select a category'}</option>
+                {categories.map((category) => (
+                  <option key={category.categoryId} value={category.categoryId}>
+                    {category.name}
+                  </option>
+                ))}
               </select>
             </div>
+            {categories.length === 0 && !loadingCategories && (
+              <p className="text-xs text-red-500 mt-1">No categories available. Please contact support.</p>
+            )}
+            {!loadingCategories && categories.length > 0 && (
+              <p className="text-xs text-gray-500 mt-1">{categories.length} categories available</p>
+            )}
           </div>
 
           {/* Description */}

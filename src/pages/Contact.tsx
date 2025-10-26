@@ -109,7 +109,7 @@ const Contact: React.FC = () => {
                   href="tel:+94112650301" 
                   className="text-[#8C00FF] font-semibold hover:underline"
                 >
-                  +94 11 265 0301
+                  © 2025 PeerPay. All rights reserved.756975298
                 </a>
               </div>
 

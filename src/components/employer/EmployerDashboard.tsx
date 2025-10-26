@@ -23,7 +23,7 @@ import PeerPayLogo from '../../assets/images/PeerPayLogo.png';
 const EmployerDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  const { data: dashboardData, loading, refetch } = useDashboardData(user?.id || '', 'Employer');
+  const { data: dashboardData, loading, refetch } = useDashboardData(user?.userId || '', 'Employer');
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const EmployerDashboard: React.FC = () => {
     // Fetch unread notifications count
     const fetchUnreadCount = async () => {
       try {
-        const count = await notificationService.getUnreadCount(user.id);
+        const count = await notificationService.getUnreadCount(user.userId);
         setUnreadCount(count);
       } catch (error) {
         console.error('Failed to fetch unread count:', error);
@@ -195,7 +195,7 @@ const EmployerDashboard: React.FC = () => {
               </div>
               <div className="divide-y divide-gray-200">
                 {dashboardData?.myJobs?.slice(0, 5).map((job: Job) => (
-                  <div key={job.id} className="p-6 hover:bg-gray-50 transition cursor-pointer" onClick={() => navigate(`/employer/jobs/${job.id}`)}>
+                  <div key={job.jobId} className="p-6 hover:bg-gray-50 transition cursor-pointer" onClick={() => navigate(`/employer/jobs/${job.jobId}`)}>
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
@@ -223,7 +223,7 @@ const EmployerDashboard: React.FC = () => {
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/employer/jobs/${job.id}/applications`);
+                          navigate(`/employer/jobs/${job.jobId}/applications`);
                         }}
                         className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition text-sm"
                       >

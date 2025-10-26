@@ -5,6 +5,7 @@ import { jobService, jobCategoryService } from '../services';
 import { toast } from 'sonner';
 import PeerPayLogo from '../assets/images/PeerPayLogo.png';
 import BannerImage from '../assets/images/BannerImage.jpeg';
+import AIChatbot from '../components/chatbot/AIChatbot';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -526,6 +527,9 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* AI Chatbot */}
+      <AIChatbot />
     </div>
   );
 }

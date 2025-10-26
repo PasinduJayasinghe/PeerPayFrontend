@@ -75,10 +75,11 @@ const JobDetails: React.FC = () => {
 
     try {
       const applications = await jobService.getStudentApplications(user.userId);
-      const applied = applications.some(app => app.jobId === id);
+      const applied = Array.isArray(applications) && applications.some(app => app.jobId === id);
       setHasApplied(applied);
     } catch (error) {
       console.error('Failed to check application status:', error);
+      // Don't show error to user, just log it
     }
   };
 

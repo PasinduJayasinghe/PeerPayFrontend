@@ -20,6 +20,9 @@ import StudentProfile from './components/student/StudentProfile.tsx'
 import EmployerDashboard from './components/employer/EmployerDashboard.tsx'
 import PostJob from './components/employer/PostJob.tsx'
 import ManageApplications from './components/employer/ManageApplications.tsx'
+import EmployerProfile from './components/employer/EmployerProfile.tsx'
+import ManageJobs from './components/employer/ManageJobs.tsx'
+import JobDetailsView from './components/employer/JobDetailsView.tsx'
 
 // // Admin Components             
  import AdminDashboard from './components/admin/AdminDashboard.tsx'
@@ -69,8 +72,11 @@ const App: React.FC = () => {
 
 
           <Route path="/employer/dashboard" element={<EmployerDashboard />} />
+          <Route path="/employer/jobs" element={<ManageJobs />} />
           <Route path="/employer/jobs/create" element={<PostJob />} />
+          <Route path="/employer/jobs/:jobId" element={<JobDetailsView />} />
           <Route path="/employer/jobs/:jobId/applications" element={<ManageApplications />} />
+          <Route path="/employer/profile" element={<EmployerProfile />} />
 
           {/* Messaging Routes */}
           <Route path="/messages" element={<MessagesPage />} />

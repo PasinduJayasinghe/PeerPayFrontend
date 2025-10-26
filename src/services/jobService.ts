@@ -5,8 +5,8 @@ import type {
   JobApplication, 
   JobStatus, 
   ApplicationStatus,
-  PaginatedResponse,
-  ApiResponse 
+  ApiResponse,
+  PaginatedResponse 
 } from '../types';
 
 interface CreateJobDto {
@@ -133,11 +133,11 @@ class JobService {
 
   /**
    * POST /api/job/search
-   * Search jobs with advanced criteria
+   * Search jobs by criteria
    */
-  async searchJobs(criteria: JobSearchCriteria): Promise<Job[]> {
+  async searchJobs(searchCriteria: JobSearchCriteria): Promise<Job[]> {
     try {
-      const response = await api.post<Job[]>(`${this.BASE_URL}/search`, criteria);
+      const response = await api.post<Job[]>(`${this.BASE_URL}/search`, searchCriteria);
       return response.data;
     } catch (error) {
       console.error('Search jobs error:', error);
@@ -147,7 +147,7 @@ class JobService {
 
   /**
    * GET /api/job/employer/{employerId}
-   * Get jobs by employer
+   * Get all jobs posted by an employer
    */
   async getJobsByEmployer(employerId: string): Promise<Job[]> {
     try {
@@ -205,14 +205,14 @@ class JobService {
 
   /**
    * GET /api/jobapplication/job/{jobId}
-   * Get applications for a job
+   * Get all applications for a specific job
    */
-  async getJobApplications(jobId: string): Promise<JobApplication[]> {
+  async getApplicationsByJob(jobId: string): Promise<JobApplication[]> {
     try {
       const response = await api.get<JobApplication[]>(`/jobapplication/job/${jobId}`);
       return response.data;
     } catch (error) {
-      console.error('Get job applications error:', error);
+      console.error('Get applications by job error:', error);
       throw error;
     }
   }

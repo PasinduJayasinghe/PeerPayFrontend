@@ -103,21 +103,25 @@ const JobBoard: React.FC = () => {
       let jobsData: Job[];
       if (hasFilters) {
         // Use search endpoint with filters
-        jobsData = await jobService.searchJobs(criteria);
+        const searchResponse = await jobService.searchJobs(criteria);
+        jobsData = Array.isArray(searchResponse) ? searchResponse : [];
       } else {
         // Get all active jobs
         const response = await jobService.getAllJobs(1, 100);
         // Handle both paginated response and direct array
         if (Array.isArray(response)) {
           jobsData = response;
-        } else if ('items' in response) {
-          jobsData = response.items;
-        } else if ('data' in response) {
-          jobsData = (response as any).data;
+        } else if (response && 'items' in response) {
+          jobsData = response.items || [];
+        } else if (response && 'data' in response) {
+          jobsData = (response as any).data || [];
         } else {
+          console.warn('Unexpected response format:', response);
           jobsData = [];
         }
       }
+      
+      console.log('Fetched jobs data:', jobsData);
 
       // Apply client-side filters for job type, pay type, and skills
       let filteredData = jobsData.filter((job: Job) => job.status === 'Active');
