@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, TrendingUp, Shield, Clock, Star, ChevronRight, Users, Briefcase, Award, ArrowRight, Menu, X } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import { jobService, jobCategoryService } from '../services';
+import { toast } from 'sonner';
 import PeerPayLogo from '../assets/images/PeerPayLogo.png';
 import BannerImage from '../assets/images/BannerImage.jpeg';
 
@@ -8,32 +10,77 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('hire');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [featuredJobs, setFeaturedJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const categories = [
-    { name: 'Web Development', icon: '💻', jobs: '2.5k+' },
-    { name: 'Mobile Apps', icon: '📱', jobs: '1.8k+' },
-    { name: 'Design & Creative', icon: '🎨', jobs: '3.2k+' },
-    { name: 'Writing & Content', icon: '✍️', jobs: '1.5k+' },
-    { name: 'Marketing', icon: '📊', jobs: '2.1k+' },
-    { name: 'Data Science', icon: '📈', jobs: '890+' },
-    { name: 'Video & Animation', icon: '🎬', jobs: '1.2k+' },
-    { name: 'Music & Audio', icon: '🎵', jobs: '650+' },
-  ];
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const topFreelancers = [
-    { name: 'Sarah Johnson', role: 'Full Stack Developer', rating: 4.9, jobs: 127, hourlyRate: 85, avatar: '👩‍💻', skills: ['React', 'Node.js', 'AWS'] },
-    { name: 'Michael Chen', role: 'UI/UX Designer', rating: 5.0, jobs: 93, hourlyRate: 75, avatar: '👨‍🎨', skills: ['Figma', 'Adobe XD', 'Prototyping'] },
-    { name: 'Emma Williams', role: 'Content Writer', rating: 4.8, jobs: 156, hourlyRate: 55, avatar: '👩‍💼', skills: ['SEO', 'Blog Writing', 'Copywriting'] },
-    { name: 'David Kumar', role: 'Mobile Developer', rating: 4.9, jobs: 82, hourlyRate: 90, avatar: '👨‍💻', skills: ['React Native', 'Flutter', 'iOS'] },
-  ];
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch categories and jobs in parallel
+      const [categoriesData, jobsData] = await Promise.all([
+        jobCategoryService.getAllCategories().catch(err => {
+          console.error('Error fetching categories:', err);
+          return [];
+        }),
+        jobService.getAllJobs(1, 6).catch(err => {
+          console.error('Error fetching jobs:', err);
+          return { items: [], totalCount: 0, page: 1, pageSize: 6, totalPages: 0 };
+        })
+      ]);
 
-  const featuredJobs = [
-    { title: 'E-commerce Website Development', budget: '$3000-$5000', duration: '1-3 months', proposals: 12, posted: '2 hours ago', skills: ['React', 'Node.js', 'MongoDB'] },
-    { title: 'Mobile App UI/UX Design', budget: '$1500-$2500', duration: '2-4 weeks', proposals: 8, posted: '5 hours ago', skills: ['Figma', 'UI Design', 'Mobile'] },
-    { title: 'SEO Content Writing', budget: '$500-$1000', duration: '1 month', proposals: 15, posted: '1 day ago', skills: ['SEO', 'Content Writing', 'Research'] },
-    { title: 'Logo & Brand Identity', budget: '$800-$1200', duration: '1-2 weeks', proposals: 22, posted: '3 hours ago', skills: ['Illustrator', 'Branding', 'Logo Design'] },
-  ];
+      setCategories(categoriesData.slice(0, 8)); // Show max 8 categories
+      setFeaturedJobs(jobsData.items || []);
+    } catch (error: any) {
+      console.error('Error loading data:', error);
+      toast.error('Failed to load some data. Using cached data.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getCategoryIcon = (name: string) => {
+    const iconMap: { [key: string]: string } = {
+      'Web Development': '�',
+      'Mobile App Development': '📱',
+      'Graphic Design': '🎨',
+      'Content Writing': '✍️',
+      'Digital Marketing': '�',
+      'Data Analysis': '📈',
+      'Video Editing': '🎬',
+      'Translation': '🌍',
+      'Photography': '📷',
+      'Tutoring': '�',
+      'Voice Over': '🎵'
+    };
+    return iconMap[name] || '💼';
+  };
+
+  const formatBudget = (amount: number) => {
+    return `Rs ${amount.toLocaleString()}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+    
+    if (diffDays === 0) {
+      return `${diffHours} hours ago`;
+    } else if (diffDays === 1) {
+      return '1 day ago';
+    } else {
+      return `${diffDays} days ago`;
+    }
+  };
 
   const stats = [
     { label: 'Active Jobs', value: '10,000+', icon: Briefcase },
@@ -205,20 +252,39 @@ export default function Home() {
             <h2 className="text-4xl font-bold text-slate-800 mb-4">Browse by Category</h2>
             <p className="text-slate-600 text-lg">Explore opportunities in your field of expertise</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {categories.map((category, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl p-6 border border-slate-200 hover:border-[#8C00FF] hover:shadow-xl transition-all cursor-pointer group"
-              >
-                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{category.icon}</div>
-                <h3 className="font-semibold text-slate-800 mb-2 group-hover:text-[#8C00FF] transition-colors">
-                  {category.name}
-                </h3>
-                <p className="text-slate-500 text-sm">{category.jobs} jobs available</p>
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, index) => (
+                <div key={index} className="bg-white rounded-2xl p-6 border border-slate-200 animate-pulse">
+                  <div className="w-12 h-12 bg-gray-200 rounded-full mb-4"></div>
+                  <div className="h-5 bg-gray-200 rounded mb-2 w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          ) : categories.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {categories.map((category, index) => (
+                <div
+                  key={category.categoryId || index}
+                  className="bg-white rounded-2xl p-6 border border-slate-200 hover:border-[#8C00FF] hover:shadow-xl transition-all cursor-pointer group"
+                  onClick={() => navigate(`/student/jobs?category=${category.categoryId}`)}
+                >
+                  <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">
+                    {getCategoryIcon(category.name)}
+                  </div>
+                  <h3 className="font-semibold text-slate-800 mb-2 group-hover:text-[#8C00FF] transition-colors">
+                    {category.name}
+                  </h3>
+                  <p className="text-slate-500 text-sm">{category.jobCount || 0} jobs available</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-slate-500 py-12">
+              <p>No categories available at the moment.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -230,12 +296,20 @@ export default function Home() {
               <h2 className="text-4xl font-bold text-slate-800 mb-2">Top Rated Freelancers</h2>
               <p className="text-slate-600 text-lg">Hire the best talent for your projects</p>
             </div>
-            <button className="flex items-center text-[#8C00FF] hover:text-[#7000CC] font-medium">
+            <button 
+              onClick={() => navigate('/student/talent')}
+              className="flex items-center text-[#8C00FF] hover:text-[#7000CC] font-medium"
+            >
               View All <ChevronRight size={20} />
             </button>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {topFreelancers.map((freelancer, index) => (
+            {[
+              { name: 'Sarah Johnson', role: 'Full Stack Developer', rating: 4.9, jobs: 127, hourlyRate: 85, avatar: '👩‍💻', skills: ['React', 'Node.js', 'AWS'] },
+              { name: 'Michael Chen', role: 'UI/UX Designer', rating: 5.0, jobs: 93, hourlyRate: 75, avatar: '👨‍🎨', skills: ['Figma', 'Adobe XD', 'Prototyping'] },
+              { name: 'Emma Williams', role: 'Content Writer', rating: 4.8, jobs: 156, hourlyRate: 55, avatar: '👩‍💼', skills: ['SEO', 'Blog Writing', 'Copywriting'] },
+              { name: 'David Kumar', role: 'Mobile Developer', rating: 4.9, jobs: 82, hourlyRate: 90, avatar: '👨‍💻', skills: ['React Native', 'Flutter', 'iOS'] },
+            ].map((freelancer, index) => (
               <div key={index} className="bg-white rounded-2xl p-6 border border-slate-200 hover:shadow-xl transition-all">
                 <div className="flex items-start justify-between mb-4">
                   <div className="text-5xl">{freelancer.avatar}</div>
@@ -276,47 +350,80 @@ export default function Home() {
               <h2 className="text-4xl font-bold text-slate-800 mb-2">Featured Jobs</h2>
               <p className="text-slate-600 text-lg">Start applying to top opportunities</p>
             </div>
-            <button className="flex items-center text-[#8C00FF] hover:text-[#7000CC] font-medium">
+            <button 
+              onClick={() => navigate('/student/jobs')}
+              className="flex items-center text-[#8C00FF] hover:text-[#7000CC] font-medium"
+            >
               View All <ChevronRight size={20} />
             </button>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {featuredJobs.map((job, index) => (
-              <div key={index} className="bg-white rounded-2xl p-6 border border-slate-200 hover:shadow-xl transition-all">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="font-bold text-slate-800 text-xl">{job.title}</h3>
-                  <span className="bg-green-50 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
-                    {job.posted}
-                  </span>
+          {loading ? (
+            <div className="grid md:grid-cols-2 gap-6">
+              {[...Array(4)].map((_, index) => (
+                <div key={index} className="bg-white rounded-2xl p-6 border border-slate-200 animate-pulse">
+                  <div className="h-6 bg-gray-200 rounded mb-4 w-3/4"></div>
+                  <div className="flex gap-2 mb-4">
+                    <div className="h-6 bg-gray-200 rounded w-20"></div>
+                    <div className="h-6 bg-gray-200 rounded w-20"></div>
+                    <div className="h-6 bg-gray-200 rounded w-20"></div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 mb-4">
+                    <div className="h-12 bg-gray-200 rounded"></div>
+                    <div className="h-12 bg-gray-200 rounded"></div>
+                    <div className="h-12 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="h-10 bg-gray-200 rounded"></div>
                 </div>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {job.skills.map((skill, i) => (
-                    <span key={i} className="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg text-sm">
-                      {skill}
+              ))}
+            </div>
+          ) : featuredJobs.length > 0 ? (
+            <div className="grid md:grid-cols-2 gap-6">
+              {featuredJobs.map((job, index) => (
+                <div key={job.jobId || index} className="bg-white rounded-2xl p-6 border border-slate-200 hover:shadow-xl transition-all">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="font-bold text-slate-800 text-xl">{job.title}</h3>
+                    <span className="bg-green-50 text-green-600 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ml-2">
+                      {formatDate(job.postedDate)}
                     </span>
-                  ))}
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {(job.requiredSkills || []).slice(0, 3).map((skill: string, i: number) => (
+                      <span key={i} className="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg text-sm">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
+                    <div>
+                      <div className="text-slate-500 mb-1">Budget</div>
+                      <div className="font-semibold text-slate-800">{formatBudget(job.payAmount)}</div>
+                    </div>
+                    <div>
+                      <div className="text-slate-500 mb-1">Duration</div>
+                      <div className="font-semibold text-slate-800">{job.durationDays} days</div>
+                    </div>
+                    <div>
+                      <div className="text-slate-500 mb-1">Applications</div>
+                      <div className="font-semibold text-slate-800">{job.applicationCount || 0}</div>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => navigate(`/student/jobs/${job.jobId}`)}
+                    className="w-full bg-[#8C00FF] text-white py-3 rounded-lg hover:bg-[#7000CC] transition-all font-medium flex items-center justify-center group"
+                  >
+                    View Details
+                    <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
+                  </button>
                 </div>
-                <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
-                  <div>
-                    <div className="text-slate-500 mb-1">Budget</div>
-                    <div className="font-semibold text-slate-800">{job.budget}</div>
-                  </div>
-                  <div>
-                    <div className="text-slate-500 mb-1">Duration</div>
-                    <div className="font-semibold text-slate-800">{job.duration}</div>
-                  </div>
-                  <div>
-                    <div className="text-slate-500 mb-1">Applications</div>
-                    <div className="font-semibold text-slate-800">{job.proposals}</div>
-                  </div>
-                </div>
-                <button className="w-full bg-[#8C00FF] text-white py-3 rounded-lg hover:bg-[#7000CC] transition-all font-medium flex items-center justify-center group">
-                  Apply Now
-                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
-                </button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-slate-500 py-12 bg-white rounded-2xl border border-slate-200">
+              <Briefcase className="mx-auto mb-4 text-slate-400" size={48} />
+              <p className="text-lg mb-2">No featured jobs available at the moment.</p>
+              <p className="text-sm">Check back soon for new opportunities!</p>
+            </div>
+          )}
         </div>
       </section>
 
