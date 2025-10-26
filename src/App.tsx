@@ -26,6 +26,10 @@ import PostJob from './components/employer/PostJob.tsx'
 // import VerificationQueue from './components/admin/VerificationQueue.tsx'
 // import ContentModeration from './components/admin/ContentModeration.tsx'
 
+// Messaging Pages
+import MessagesPage from './pages/MessagesPage.tsx'
+import ChatPage from './pages/ChatPage.tsx'
+
 // Common
 import Home from './pages/Home.tsx'
 import NotFound from './pages/NotFound.tsx'
@@ -55,6 +59,9 @@ const App: React.FC = () => {
           <Route path="/employer/jobs/create" element={<PostJob />} />
           {/* <Route path="/employer/applications" element={<ManageApplications />} /> */}
 
+          {/* Messaging Routes */}
+          <Route path="/messages" element={<MessagesPage />} />
+          <Route path="/messages/:conversationId" element={<ChatPage />} />
 
            <Route path="/admin/dashboard" element={<AdminDashboard />} />
           {/* <Route path="/admin/verification" element={<VerificationQueue />} />

@@ -115,7 +115,11 @@ const PostJob: React.FC = () => {
         .map((skill) => skill.trim())
         .filter((skill) => skill.length > 0);
 
-      await jobService.createJob({
+      // Convert date string to ISO DateTime format
+      const deadlineDate = new Date(formData.deadline);
+      const isoDeadline = deadlineDate.toISOString();
+
+      const jobData = {
         employerId: user.userId,
         categoryId: formData.categoryId,
         title: formData.title,
@@ -124,17 +128,27 @@ const PostJob: React.FC = () => {
         payType: formData.payType,
         durationDays: parseInt(formData.durationDays),
         requiredSkills: skillsArray,
-        deadline: formData.deadline,
+        deadline: isoDeadline,
         location: formData.location,
         jobType: formData.jobType,
         maxApplicants: parseInt(formData.maxApplicants),
-      });
+      };
+
+      console.log('Creating job with data:', jobData);
+      await jobService.createJob(jobData);
 
       toast.success('Job posted successfully!');
       navigate('/employer/dashboard');
     } catch (error: any) {
       console.error('Error posting job:', error);
-      toast.error(error.response?.data?.error || 'Failed to post job. Please try again.');
+      console.error('Error details:', error.response?.data);
+      console.error('Validation errors:', error.response?.data?.errors);
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.title || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          'Failed to post job. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

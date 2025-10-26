@@ -9,11 +9,12 @@ import {
   Calendar,
   Clock,
   ArrowLeft,
-  TrendingUp,
   Users,
-  Star,
   BookmarkPlus,
-  Bookmark
+  Bookmark,
+  X,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { jobService } from '../../services';
@@ -21,19 +22,43 @@ import { toast } from 'sonner';
 import type { Job, JobType, PayType } from '../../types';
 import PeerPayLogo from '../../assets/images/PeerPayLogo.png';
 
+interface FilterState {
+  searchTerm: string;
+  location: string;
+  categoryId: string;
+  jobTypes: JobType[];
+  payTypes: PayType[];
+  minPay: string;
+  maxPay: string;
+  skills: string[];
+}
+
 const JobBoard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedJobType, setSelectedJobType] = useState<JobType | 'All'>('All');
-  const [selectedPayType, setSelectedPayType] = useState<PayType | 'All'>('All');
-  const [minBudget, setMinBudget] = useState<string>('');
-  const [maxBudget, setMaxBudget] = useState<string>('');
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
+  const [skillInput, setSkillInput] = useState('');
+  
+  const [filters, setFilters] = useState<FilterState>({
+    searchTerm: '',
+    location: '',
+    categoryId: '',
+    jobTypes: [],
+    payTypes: [],
+    minPay: '',
+    maxPay: '',
+    skills: []
+  });
+
+  const [expandedSections, setExpandedSections] = useState({
+    jobType: true,
+    payType: true,
+    budget: true,
+    skills: false
+  });
 
   useEffect(() => {
     if (!user) {
@@ -41,23 +66,84 @@ const JobBoard: React.FC = () => {
       return;
     }
 
-    fetchJobs();
     loadSavedJobs();
+    searchJobs();
   }, [user, navigate]);
 
-  useEffect(() => {
-    applyFilters();
-  }, [searchQuery, selectedJobType, selectedPayType, minBudget, maxBudget, jobs]);
-
-  const fetchJobs = async () => {
+  const searchJobs = async () => {
     try {
       setLoading(true);
-      const response = await jobService.getAllJobs(1, 100);
-      // Backend returns array directly in response.data, not response.data.data
-      const jobsData = Array.isArray(response.data) ? response.data : (response.data?.data || []);
-      const activeJobs = jobsData.filter((job: Job) => job.status === 'Active');
-      setJobs(activeJobs);
-      setFilteredJobs(activeJobs);
+      
+      // Build search criteria
+      const criteria: any = {};
+      
+      if (filters.searchTerm.trim()) {
+        criteria.searchTerm = filters.searchTerm.trim();
+      }
+      
+      if (filters.location.trim()) {
+        criteria.location = filters.location.trim();
+      }
+      
+      if (filters.categoryId) {
+        criteria.categoryId = filters.categoryId;
+      }
+      
+      if (filters.minPay) {
+        criteria.minPay = parseFloat(filters.minPay);
+      }
+      
+      if (filters.maxPay) {
+        criteria.maxPay = parseFloat(filters.maxPay);
+      }
+
+      // Check if we have any filters to apply
+      const hasFilters = Object.keys(criteria).length > 0;
+      
+      let jobsData: Job[];
+      if (hasFilters) {
+        // Use search endpoint with filters
+        jobsData = await jobService.searchJobs(criteria);
+      } else {
+        // Get all active jobs
+        const response = await jobService.getAllJobs(1, 100);
+        // Handle both paginated response and direct array
+        if (Array.isArray(response)) {
+          jobsData = response;
+        } else if ('items' in response) {
+          jobsData = response.items;
+        } else if ('data' in response) {
+          jobsData = (response as any).data;
+        } else {
+          jobsData = [];
+        }
+      }
+
+      // Apply client-side filters for job type, pay type, and skills
+      let filteredData = jobsData.filter((job: Job) => job.status === 'Active');
+
+      // Filter by job types
+      if (filters.jobTypes.length > 0) {
+        filteredData = filteredData.filter(job => filters.jobTypes.includes(job.jobType));
+      }
+
+      // Filter by pay types
+      if (filters.payTypes.length > 0) {
+        filteredData = filteredData.filter(job => filters.payTypes.includes(job.payType));
+      }
+
+      // Filter by skills
+      if (filters.skills.length > 0) {
+        filteredData = filteredData.filter(job =>
+          filters.skills.some(skill =>
+            job.requiredSkills.some(reqSkill =>
+              reqSkill.toLowerCase().includes(skill.toLowerCase())
+            )
+          )
+        );
+      }
+
+      setJobs(filteredData);
     } catch (error) {
       console.error('Failed to fetch jobs:', error);
       toast.error('Failed to load jobs');
@@ -86,48 +172,71 @@ const JobBoard: React.FC = () => {
     localStorage.setItem(`savedJobs_${user?.userId}`, JSON.stringify([...newSavedJobs]));
   };
 
-  const applyFilters = () => {
-    let filtered = [...jobs];
-
-    // Search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        job =>
-          job.title.toLowerCase().includes(query) ||
-          job.description.toLowerCase().includes(query) ||
-          job.location.toLowerCase().includes(query) ||
-          job.requiredSkills.some(skill => skill.toLowerCase().includes(query))
-      );
-    }
-
-    // Job type filter
-    if (selectedJobType !== 'All') {
-      filtered = filtered.filter(job => job.jobType === selectedJobType);
-    }
-
-    // Pay type filter
-    if (selectedPayType !== 'All') {
-      filtered = filtered.filter(job => job.payType === selectedPayType);
-    }
-
-    // Budget filters
-    if (minBudget) {
-      filtered = filtered.filter(job => job.payAmount >= parseFloat(minBudget));
-    }
-    if (maxBudget) {
-      filtered = filtered.filter(job => job.payAmount <= parseFloat(maxBudget));
-    }
-
-    setFilteredJobs(filtered);
+  const handleSearch = () => {
+    setShowFilterPanel(false);
+    searchJobs();
   };
 
   const resetFilters = () => {
-    setSearchQuery('');
-    setSelectedJobType('All');
-    setSelectedPayType('All');
-    setMinBudget('');
-    setMaxBudget('');
+    setFilters({
+      searchTerm: '',
+      location: '',
+      categoryId: '',
+      jobTypes: [],
+      payTypes: [],
+      minPay: '',
+      maxPay: '',
+      skills: []
+    });
+    setSkillInput('');
+  };
+
+  const toggleJobType = (type: JobType) => {
+    setFilters(prev => ({
+      ...prev,
+      jobTypes: prev.jobTypes.includes(type)
+        ? prev.jobTypes.filter(t => t !== type)
+        : [...prev.jobTypes, type]
+    }));
+  };
+
+  const togglePayType = (type: PayType) => {
+    setFilters(prev => ({
+      ...prev,
+      payTypes: prev.payTypes.includes(type)
+        ? prev.payTypes.filter(t => t !== type)
+        : [...prev.payTypes, type]
+    }));
+  };
+
+  const addSkill = () => {
+    const skill = skillInput.trim();
+    if (skill && !filters.skills.includes(skill)) {
+      setFilters(prev => ({
+        ...prev,
+        skills: [...prev.skills, skill]
+      }));
+      setSkillInput('');
+    }
+  };
+
+  const removeSkill = (skill: string) => {
+    setFilters(prev => ({
+      ...prev,
+      skills: prev.skills.filter(s => s !== skill)
+    }));
+  };
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  const hasActiveFilters = () => {
+    return filters.searchTerm || filters.location || filters.jobTypes.length > 0 ||
+           filters.payTypes.length > 0 || filters.minPay || filters.maxPay || filters.skills.length > 0;
   };
 
   const getJobTypeColor = (jobType: JobType) => {
@@ -197,7 +306,7 @@ const JobBoard: React.FC = () => {
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Job Board</h1>
                 <p className="text-sm text-gray-600">
-                  {filteredJobs.length} {filteredJobs.length === 1 ? 'job' : 'jobs'} available
+                  {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'} available
                 </p>
               </div>
             </div>
@@ -212,118 +321,301 @@ const JobBoard: React.FC = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search and Filter Bar */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
+        {/* Search Bar */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+          <div className="flex gap-3">
             {/* Search Input */}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search jobs by title, description, skills, or location..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search jobs by title, description, or location..."
+                value={filters.searchTerm}
+                onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8C00FF] focus:border-transparent"
               />
             </div>
 
-            {/* Filter Toggle */}
+            {/* Filter Button */}
             <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              onClick={() => setShowFilterPanel(!showFilterPanel)}
+              className={`flex items-center gap-2 px-6 py-3 border rounded-lg transition ${
+                hasActiveFilters()
+                  ? 'bg-[#8C00FF] text-white border-[#8C00FF] hover:bg-[#7000CC]'
+                  : 'border-gray-300 hover:bg-gray-50'
+              }`}
             >
               <Filter className="w-5 h-5" />
               Filters
+              {hasActiveFilters() && (
+                <span className="ml-1 px-2 py-0.5 bg-white text-[#8C00FF] rounded-full text-xs font-semibold">
+                  {[
+                    filters.jobTypes.length,
+                    filters.payTypes.length,
+                    filters.skills.length,
+                    filters.location ? 1 : 0,
+                    filters.minPay || filters.maxPay ? 1 : 0
+                  ].reduce((a, b) => a + b, 0)}
+                </span>
+              )}
+            </button>
+
+            {/* Search Button */}
+            <button
+              onClick={handleSearch}
+              className="px-8 py-3 bg-[#8C00FF] text-white rounded-lg hover:bg-[#7000CC] transition font-medium"
+            >
+              Search
             </button>
           </div>
-
-          {/* Advanced Filters */}
-          {showFilters && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Job Type */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Job Type</label>
-                  <select
-                    value={selectedJobType}
-                    onChange={(e) => setSelectedJobType(e.target.value as JobType | 'All')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8C00FF] focus:border-transparent"
-                  >
-                    <option value="All">All Types</option>
-                    <option value="FullTime">Full Time</option>
-                    <option value="PartTime">Part Time</option>
-                    <option value="ProjectBased">Project Based</option>
-                    <option value="Freelance">Freelance</option>
-                  </select>
-                </div>
-
-                {/* Pay Type */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Pay Type</label>
-                  <select
-                    value={selectedPayType}
-                    onChange={(e) => setSelectedPayType(e.target.value as PayType | 'All')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8C00FF] focus:border-transparent"
-                  >
-                    <option value="All">All Pay Types</option>
-                    <option value="Hourly">Hourly</option>
-                    <option value="Daily">Daily</option>
-                    <option value="Weekly">Weekly</option>
-                    <option value="Monthly">Monthly</option>
-                    <option value="Fixed">Fixed</option>
-                  </select>
-                </div>
-
-                {/* Min Budget */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Min Budget ($)</label>
-                  <input
-                    type="number"
-                    placeholder="0"
-                    value={minBudget}
-                    onChange={(e) => setMinBudget(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8C00FF] focus:border-transparent"
-                  />
-                </div>
-
-                {/* Max Budget */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Max Budget ($)</label>
-                  <input
-                    type="number"
-                    placeholder="Any"
-                    value={maxBudget}
-                    onChange={(e) => setMaxBudget(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8C00FF] focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-4 flex justify-end">
-                <button
-                  onClick={resetFilters}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium"
-                >
-                  Reset Filters
-                </button>
-              </div>
-            </div>
-          )}
         </div>
 
+        {/* Filter Side Panel */}
+        {showFilterPanel && (
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 z-40"
+              onClick={() => setShowFilterPanel(false)}
+            />
+
+            {/* Side Panel */}
+            <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl z-50 overflow-y-auto">
+              <div className="p-6">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">Filters</h2>
+                  <button
+                    onClick={() => setShowFilterPanel(false)}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Location Filter */}
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    <MapPin className="w-4 h-4 inline mr-2" />
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Colombo, Remote"
+                    value={filters.location}
+                    onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8C00FF] focus:border-transparent"
+                  />
+                </div>
+
+                {/* Job Type Filter */}
+                <div className="mb-6">
+                  <button
+                    onClick={() => toggleSection('jobType')}
+                    className="w-full flex items-center justify-between mb-2"
+                  >
+                    <span className="text-sm font-semibold text-gray-900">
+                      <Briefcase className="w-4 h-4 inline mr-2" />
+                      Job Type
+                    </span>
+                    {expandedSections.jobType ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </button>
+                  {expandedSections.jobType && (
+                    <div className="space-y-2">
+                      {(['FullTime', 'PartTime', 'ProjectBased', 'Freelance'] as JobType[]).map(type => (
+                        <label key={type} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={filters.jobTypes.includes(type)}
+                            onChange={() => toggleJobType(type)}
+                            className="w-4 h-4 text-[#8C00FF] border-gray-300 rounded focus:ring-[#8C00FF]"
+                          />
+                          <span className="text-sm text-gray-700">
+                            {type === 'FullTime' ? 'Full Time' :
+                             type === 'PartTime' ? 'Part Time' :
+                             type === 'ProjectBased' ? 'Project Based' :
+                             'Freelance'}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Pay Type Filter */}
+                <div className="mb-6">
+                  <button
+                    onClick={() => toggleSection('payType')}
+                    className="w-full flex items-center justify-between mb-2"
+                  >
+                    <span className="text-sm font-semibold text-gray-900">
+                      <DollarSign className="w-4 h-4 inline mr-2" />
+                      Payment Type
+                    </span>
+                    {expandedSections.payType ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </button>
+                  {expandedSections.payType && (
+                    <div className="space-y-2">
+                      {(['Hourly', 'Daily', 'Weekly', 'Monthly', 'Fixed'] as PayType[]).map(type => (
+                        <label key={type} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={filters.payTypes.includes(type)}
+                            onChange={() => togglePayType(type)}
+                            className="w-4 h-4 text-[#8C00FF] border-gray-300 rounded focus:ring-[#8C00FF]"
+                          />
+                          <span className="text-sm text-gray-700">{type}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Budget Range Filter */}
+                <div className="mb-6">
+                  <button
+                    onClick={() => toggleSection('budget')}
+                    className="w-full flex items-center justify-between mb-2"
+                  >
+                    <span className="text-sm font-semibold text-gray-900">
+                      <DollarSign className="w-4 h-4 inline mr-2" />
+                      Budget Range
+                    </span>
+                    {expandedSections.budget ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </button>
+                  {expandedSections.budget && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">Min ($)</label>
+                        <input
+                          type="number"
+                          placeholder="0"
+                          value={filters.minPay}
+                          onChange={(e) => setFilters(prev => ({ ...prev, minPay: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8C00FF] focus:border-transparent"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">Max ($)</label>
+                        <input
+                          type="number"
+                          placeholder="Any"
+                          value={filters.maxPay}
+                          onChange={(e) => setFilters(prev => ({ ...prev, maxPay: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8C00FF] focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Skills Filter */}
+                <div className="mb-6">
+                  <button
+                    onClick={() => toggleSection('skills')}
+                    className="w-full flex items-center justify-between mb-2"
+                  >
+                    <span className="text-sm font-semibold text-gray-900">
+                      Skills Required
+                    </span>
+                    {expandedSections.skills ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </button>
+                  {expandedSections.skills && (
+                    <div>
+                      <div className="flex gap-2 mb-3">
+                        <input
+                          type="text"
+                          placeholder="Add skill..."
+                          value={skillInput}
+                          onChange={(e) => setSkillInput(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && addSkill()}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8C00FF] focus:border-transparent"
+                        />
+                        <button
+                          onClick={addSkill}
+                          className="px-4 py-2 bg-[#8C00FF] text-white rounded-lg hover:bg-[#7000CC] transition"
+                        >
+                          Add
+                        </button>
+                      </div>
+                      {filters.skills.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {filters.skills.map(skill => (
+                            <span
+                              key={skill}
+                              className="inline-flex items-center gap-1 px-3 py-1 bg-[#8C00FF] bg-opacity-10 text-[#8C00FF] rounded-full text-sm"
+                            >
+                              {skill}
+                              <button
+                                onClick={() => removeSkill(skill)}
+                                className="hover:bg-[#8C00FF] hover:bg-opacity-20 rounded-full p-0.5"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-6 border-t border-gray-200">
+                  <button
+                    onClick={() => {
+                      resetFilters();
+                      handleSearch();
+                    }}
+                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    onClick={handleSearch}
+                    className="flex-1 px-4 py-3 bg-[#8C00FF] text-white rounded-lg hover:bg-[#7000CC] transition font-medium"
+                  >
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
         {/* Jobs Grid */}
-        {filteredJobs.length === 0 ? (
+        {jobs.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
             <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No Jobs Found</h3>
             <p className="text-gray-600 mb-6">
-              {searchQuery || selectedJobType !== 'All' || selectedPayType !== 'All' || minBudget || maxBudget
+              {hasActiveFilters()
                 ? 'Try adjusting your filters to see more results'
                 : 'No active jobs available at the moment'}
             </p>
-            {(searchQuery || selectedJobType !== 'All' || selectedPayType !== 'All' || minBudget || maxBudget) && (
+            {hasActiveFilters() && (
               <button
-                onClick={resetFilters}
+                onClick={() => {
+                  resetFilters();
+                  handleSearch();
+                }}
                 className="px-6 py-3 bg-[#8C00FF] text-white rounded-lg hover:bg-[#7000CC] transition"
               >
                 Clear Filters
@@ -332,7 +624,7 @@ const JobBoard: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredJobs.map((job) => {
+            {jobs.map((job) => {
               const daysRemaining = getDaysRemaining(job.deadline);
               const isSaved = savedJobs.has(job.jobId);
 

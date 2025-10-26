@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search, TrendingUp, Shield, Clock, Star, ChevronRight, Users, Briefcase, Award, ArrowRight, Menu, X } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import PeerPayLogo from '../assets/images/PeerPayLogo.png';
@@ -299,15 +299,15 @@ export default function Home() {
                 <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
                   <div>
                     <div className="text-slate-500 mb-1">Budget</div>
-                    <div className="font-semibold text-slate-800">${job.payAmount}</div>
+                    <div className="font-semibold text-slate-800">{job.budget}</div>
                   </div>
                   <div>
                     <div className="text-slate-500 mb-1">Duration</div>
-                    <div className="font-semibold text-slate-800">{job.durationDays} days</div>
+                    <div className="font-semibold text-slate-800">{job.duration}</div>
                   </div>
                   <div>
                     <div className="text-slate-500 mb-1">Applications</div>
-                    <div className="font-semibold text-slate-800">{job.applicationCount || 0}</div>
+                    <div className="font-semibold text-slate-800">{job.proposals}</div>
                   </div>
                 </div>
                 <button className="w-full bg-[#8C00FF] text-white py-3 rounded-lg hover:bg-[#7000CC] transition-all font-medium flex items-center justify-center group">

@@ -48,16 +48,11 @@ interface UpdateApplicationStatusDto {
 }
 
 interface JobSearchCriteria {
-  keyword?: string;
-  category?: string;
-  minBudget?: number;
-  maxBudget?: number;
-  skills?: string[];
+  searchTerm?: string;
   location?: string;
-  sortBy?: 'budget' | 'deadline' | 'created' | 'relevance';
-  sortOrder?: 'asc' | 'desc';
-  page?: number;
-  pageSize?: number;
+  categoryId?: string;
+  minPay?: number;
+  maxPay?: number;
 }
 
 class JobService {
@@ -69,10 +64,13 @@ class JobService {
    */
   async createJob(jobData: CreateJobDto): Promise<Job> {
     try {
+      console.log('Sending job data:', jobData);
       const response = await api.post<Job>(`${this.BASE_URL}`, jobData);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Create job error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
       throw error;
     }
   }
@@ -137,9 +135,9 @@ class JobService {
    * POST /api/job/search
    * Search jobs with advanced criteria
    */
-  async searchJobs(criteria: JobSearchCriteria): Promise<PaginatedResponse<Job>> {
+  async searchJobs(criteria: JobSearchCriteria): Promise<Job[]> {
     try {
-      const response = await api.post<PaginatedResponse<Job>>(`${this.BASE_URL}/search`, criteria);
+      const response = await api.post<Job[]>(`${this.BASE_URL}/search`, criteria);
       return response.data;
     } catch (error) {
       console.error('Search jobs error:', error);

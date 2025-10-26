@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Star, MessageCircle, Clock, DollarSign, CheckCircle, AlertCircle,
     Download, Eye, Filter, ChevronDown, User, Briefcase, TrendingUp,
@@ -102,8 +103,38 @@ const EmployerManageApplications: React.FC = () => {
         alert(`Hired ${selectedApp?.studentName}`);
     };
 
-    const handleMessage = (): void => {
-        alert(`Message ${selectedApp?.studentName}`);
+    const handleMessage = async (): Promise<void> => {
+        if (!selectedApp) return;
+        
+        try {
+            // Create or get conversation
+            const currentUserId = 'employer-123'; // Replace with actual user ID from auth context
+            const studentId = `student-${selectedApp.id}`;
+            
+            // Try to create conversation
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://localhost:7255/api'}/conversation`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    participant1Id: currentUserId,
+                    participant2Id: studentId,
+                }),
+            });
+            
+            const conversation = await response.json();
+            
+            // Navigate to chat
+            navigate(`/messages/${conversation.conversationId}`, {
+                state: {
+                    otherUserId: studentId,
+                    otherUserName: selectedApp.studentName,
+                },
+            });
+        } catch (error) {
+            console.error('Failed to create conversation:', error);
+            // Fallback: just navigate to messages list
+            navigate('/messages');
+        }
     };
 
     return (
