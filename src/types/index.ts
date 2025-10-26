@@ -213,7 +213,8 @@ export interface RatingStats {
 }
 
 // Payment types
-export type PaymentStatus = 'Pending' | 'Completed' | 'Failed' | 'Refunded';
+export type PaymentStatus = 'Pending' | 'Escrowed' | 'Released' | 'Completed' | 'Failed' | 'Refunded' | 'Disputed';
+export type EscrowStatus = 'Funded' | 'Held' | 'Released' | 'Refunded' | 'Disputed';
 
 export interface Payment {
   paymentId: string;
@@ -234,6 +235,47 @@ export interface PaymentIntent {
   clientSecret: string;
   amount: number;
   currency: string;
+}
+
+export interface EscrowWallet {
+  escrowId: string;
+  jobId: string;
+  jobTitle?: string;
+  employerId: string;
+  employerName?: string;
+  studentId: string;
+  studentName?: string;
+  amount: number;
+  platformFee: number;
+  studentAmount: number;
+  status: EscrowStatus;
+  fundedAt: string;
+  releasedAt?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WalletBalance {
+  userId: string;
+  availableBalance: number;
+  escrowedBalance: number;
+  totalEarnings: number;
+  totalSpent: number;
+  currency: string;
+  lastUpdated: string;
+}
+
+export interface Transaction {
+  transactionId: string;
+  userId: string;
+  type: 'Credit' | 'Debit' | 'Escrow' | 'Release' | 'Refund' | 'Withdrawal';
+  amount: number;
+  balance: number;
+  description: string;
+  relatedEntityId?: string;
+  relatedEntityType?: 'Job' | 'Payment' | 'Escrow';
+  createdAt: string;
 }
 
 // API Response wrapper

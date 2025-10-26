@@ -46,6 +46,9 @@ import Enterprise from './pages/Enterprise.tsx'
 import DirectContracts from './pages/DirectContracts.tsx'
 import FindFreelanceJobs from './pages/FindFreelanceJobs.tsx'
 
+// Wallet Page
+import WalletPage from './pages/WalletPage.tsx'
+
 // Common
 import Home from './pages/Home.tsx'
 import NotFound from './pages/NotFound.tsx'
@@ -81,6 +84,9 @@ const App: React.FC = () => {
           {/* Messaging Routes */}
           <Route path="/messages" element={<MessagesPage />} />
           <Route path="/messages/:conversationId" element={<ChatPage />} />
+
+          {/* Wallet Route */}
+          <Route path="/wallet" element={<WalletPage />} />
 
           {/* Footer Pages */}
           <Route path="/about" element={<AboutUs />} />

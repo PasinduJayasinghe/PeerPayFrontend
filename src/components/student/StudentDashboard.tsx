@@ -10,7 +10,8 @@ import {
   LogOut,
   User,
   TrendingUp,
-  MessageCircle
+  MessageCircle,
+  Wallet
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useDashboardData } from '../../services/dashboardService';
@@ -93,6 +94,13 @@ const StudentDashboard: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <button 
+                onClick={() => navigate('/wallet')}
+                className="p-2 text-gray-600 hover:text-[#8C00FF] transition"
+                title="My Wallet"
+              >
+                <Wallet className="w-6 h-6" />
+              </button>
               <button 
                 onClick={() => navigate('/messages')}
                 className="p-2 text-gray-600 hover:text-[#8C00FF] transition"
