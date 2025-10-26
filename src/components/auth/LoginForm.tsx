@@ -15,7 +15,7 @@ interface LoginFormData {
 
 const LoginForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [userType, setUserType] = useState<'student' | 'employer'>('student');
+  const [userType, setUserType] = useState<'student' | 'employer' | 'admin'>('student');
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
   const { loading, execute } = useAuthService();
@@ -97,10 +97,10 @@ const LoginForm: React.FC = () => {
         </div>
 
         <div className="flex gap-4 mb-8">
-          {['student', 'employer'].map((type) => (
+          {['student', 'employer', 'admin'].map((type) => (
             <button
               key={type}
-              onClick={() => setUserType(type as 'student' | 'employer')}
+              onClick={() => setUserType(type as 'student' | 'employer' | 'admin')}
               className={`flex-1 px-4 py-3 rounded-lg font-bold transition capitalize ${
                 userType === type
                   ? 'bg-blue-600 text-white'
