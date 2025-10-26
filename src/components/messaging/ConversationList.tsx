@@ -34,8 +34,56 @@ const ConversationList: React.FC<ConversationListProps> = ({ currentUserId, user
 
   const fetchConversations = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/conversation/user/${currentUserId}`);
-      setConversations(response.data);
+      // FOR DEMO VIDEO: Mock conversation data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const mockConversations: Conversation[] = [
+        {
+          conversationId: 'conv-1',
+          participant1Id: currentUserId,
+          participant2Id: userType === 'student' ? 'emp-101' : 'stu-201',
+          participant1Name: 'You',
+          participant2Name: userType === 'student' ? 'Tech Solutions Inc.' : 'John Smith',
+          lastMessageContent: userType === 'student' 
+            ? 'When can you start the project?' 
+            : 'I can start immediately. The project looks interesting!',
+          lastMessageAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+          unreadCount: 2,
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+        },
+        {
+          conversationId: 'conv-2',
+          participant1Id: currentUserId,
+          participant2Id: userType === 'student' ? 'emp-102' : 'stu-202',
+          participant1Name: 'You',
+          participant2Name: userType === 'student' ? 'Creative Agency' : 'Sarah Johnson',
+          lastMessageContent: userType === 'student'
+            ? 'Thanks for applying! Let me review your portfolio.'
+            : 'I have 3 years of experience in this field.',
+          lastMessageAt: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+          unreadCount: 0,
+          createdAt: new Date(Date.now() - 172800000).toISOString(),
+        },
+        {
+          conversationId: 'conv-3',
+          participant1Id: currentUserId,
+          participant2Id: userType === 'student' ? 'emp-103' : 'stu-203',
+          participant1Name: 'You',
+          participant2Name: userType === 'student' ? 'Digital Marketing Co.' : 'Mike Chen',
+          lastMessageContent: userType === 'student'
+            ? 'The deadline is flexible, we can discuss.'
+            : 'What is the project timeline?',
+          lastMessageAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+          unreadCount: 1,
+          createdAt: new Date(Date.now() - 259200000).toISOString(),
+        },
+      ];
+      
+      setConversations(mockConversations);
+      
+      // Original API call (commented for demo):
+      // const response = await axios.get(`${API_BASE_URL}/conversation/user/${currentUserId}`);
+      // setConversations(response.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load conversations');
     } finally {

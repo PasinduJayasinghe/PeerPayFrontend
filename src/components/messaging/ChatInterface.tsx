@@ -58,17 +58,69 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentUserId, currentUse
 
   const fetchMessages = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/message/conversation/${conversationId}`);
-      setMessages(response.data);
+      // FOR DEMO VIDEO: Mock message data
+      await new Promise(resolve => setTimeout(resolve, 500));
       
+      const mockMessages: Message[] = [
+        {
+          messageId: 'msg-1',
+          conversationId: conversationId || '',
+          senderId: otherUserId || 'other-user',
+          receiverId: currentUserId,
+          content: 'Hi! I saw your profile and I think you would be perfect for this project.',
+          isRead: true,
+          sentAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+        },
+        {
+          messageId: 'msg-2',
+          conversationId: conversationId || '',
+          senderId: currentUserId,
+          receiverId: otherUserId || 'other-user',
+          content: 'Thank you! I\'d love to learn more about the project.',
+          isRead: true,
+          sentAt: new Date(Date.now() - 82800000).toISOString(),
+        },
+        {
+          messageId: 'msg-3',
+          conversationId: conversationId || '',
+          senderId: otherUserId || 'other-user',
+          receiverId: currentUserId,
+          content: 'Great! It\'s a web development project. Are you available to start this week?',
+          isRead: true,
+          sentAt: new Date(Date.now() - 79200000).toISOString(),
+        },
+        {
+          messageId: 'msg-4',
+          conversationId: conversationId || '',
+          senderId: currentUserId,
+          receiverId: otherUserId || 'other-user',
+          content: 'Yes, I\'m available. What are the project requirements?',
+          isRead: true,
+          sentAt: new Date(Date.now() - 75600000).toISOString(),
+        },
+        {
+          messageId: 'msg-5',
+          conversationId: conversationId || '',
+          senderId: otherUserId || 'other-user',
+          receiverId: currentUserId,
+          content: 'I\'ll send you the detailed requirements document. When can we schedule a call?',
+          isRead: false,
+          sentAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+        },
+      ];
+      
+      setMessages(mockMessages);
+      
+      // Original API call (commented for demo):
+      // const response = await axios.get(`${API_BASE_URL}/message/conversation/${conversationId}`);
+      // setMessages(response.data);
       // Mark unread messages as read
-      const unreadMessages = response.data.filter(
-        (msg: Message) => !msg.isRead && msg.receiverId === currentUserId
-      );
-      
-      for (const msg of unreadMessages) {
-        await markAsRead(msg.messageId);
-      }
+      // const unreadMessages = response.data.filter(
+      //   (msg: Message) => !msg.isRead && msg.receiverId === currentUserId
+      // );
+      // for (const msg of unreadMessages) {
+      //   await markAsRead(msg.messageId);
+      // }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load messages');
     } finally {
@@ -92,16 +144,31 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentUserId, currentUse
     setError('');
 
     try {
-      const messageData = {
-        conversationId,
+      // FOR DEMO VIDEO: Simulate sending message
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const newMsg: Message = {
+        messageId: `msg-${Date.now()}`,
+        conversationId: conversationId || '',
         senderId: currentUserId,
-        receiverId: otherUserId,
+        receiverId: otherUserId || 'other-user',
         content: newMessage.trim(),
+        isRead: false,
+        sentAt: new Date().toISOString(),
       };
-
-      const response = await axios.post(`${API_BASE_URL}/message/send`, messageData);
-      setMessages([...messages, response.data]);
+      
+      setMessages([...messages, newMsg]);
       setNewMessage('');
+      
+      // Original API call (commented for demo):
+      // const messageData = {
+      //   conversationId,
+      //   senderId: currentUserId,
+      //   receiverId: otherUserId,
+      //   content: newMessage.trim(),
+      // };
+      // const response = await axios.post(`${API_BASE_URL}/message/send`, messageData);
+      // setMessages([...messages, response.data]);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to send message');
     } finally {
