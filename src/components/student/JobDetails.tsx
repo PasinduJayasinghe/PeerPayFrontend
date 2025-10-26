@@ -35,7 +35,7 @@ const JobDetails: React.FC = () => {
   const [hasApplied, setHasApplied] = useState(false);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
-  const [attachments, setAttachments] = useState<string[]>([]);
+  const [attachments, setAttachments] = useState<File[]>([]);
   const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
@@ -690,30 +690,45 @@ const JobDetails: React.FC = () => {
                   <p className="text-sm text-gray-600 mb-2">
                     Upload your resume, portfolio, or other relevant documents
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 mb-4">
                     Maximum file size: 10MB
                   </p>
                   <input
-                    type="text"
-                    placeholder="Enter file URL or path"
+                    type="file"
+                    accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
+                    multiple
                     onChange={(e) => {
-                      if (e.target.value.trim()) {
-                        setAttachments([...attachments, e.target.value.trim()]);
-                        e.target.value = '';
+                      if (e.target.files && e.target.files.length > 0) {
+                        const newFiles = Array.from(e.target.files);
+                        setAttachments([...attachments, ...newFiles]);
                       }
                     }}
-                    className="mt-4 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8C00FF] focus:border-transparent"
+                    className="hidden"
+                    id="file-upload"
                     disabled={applying}
                   />
+                  <label
+                    htmlFor="file-upload"
+                    className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer transition"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Choose Files
+                  </label>
                 </div>
                 {attachments.length > 0 && (
                   <div className="mt-3 space-y-2">
-                    {attachments.map((attachment, index) => (
+                    {attachments.map((file, index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="text-sm text-gray-700 truncate flex-1">{attachment}</span>
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-700 truncate">{file.name}</p>
+                            <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(2)} KB</p>
+                          </div>
+                        </div>
                         <button
                           onClick={() => setAttachments(attachments.filter((_, i) => i !== index))}
-                          className="ml-2 p-1 hover:bg-gray-200 rounded transition"
+                          className="ml-2 p-1 hover:bg-gray-200 rounded transition flex-shrink-0"
                           disabled={applying}
                         >
                           <X className="w-4 h-4 text-gray-600" />
