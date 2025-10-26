@@ -43,15 +43,19 @@ const EscrowDeposit: React.FC<EscrowDepositProps> = ({
     try {
       setLoading(true);
       
-      await escrowService.createEscrow({
-        jobId,
-        employerId,
-        studentId,
-        amount: jobAmount,
-        notes: `Escrow deposit for job: ${jobTitle}`,
-      });
+      // FOR DEMO VIDEO: Simulate escrow deposit
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // await escrowService.createEscrow({
+      //   jobId,
+      //   employerId,
+      //   studentId,
+      //   amount: jobAmount,
+      //   notes: `Escrow deposit for job: ${jobTitle}`,
+      // });
 
       toast.success('Funds deposited to escrow successfully!');
+      toast.info('Payment is now secured. Student can begin work.');
       onSuccess?.();
       onClose();
     } catch (error: any) {

@@ -4,11 +4,13 @@ import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import WalletBalance from '../components/wallet/WalletBalance';
 import TransactionHistory from '../components/wallet/TransactionHistory';
+import WithdrawFunds from '../components/wallet/WithdrawFunds';
 
 const WalletPage: React.FC = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [availableBalance, setAvailableBalance] = useState(2500);
 
   if (!user) {
     return (
@@ -44,27 +46,28 @@ const WalletPage: React.FC = () => {
 
         {/* Wallet Balance */}
         <div className="mb-8">
-          <WalletBalance userId={user.userId} userRole={userRole} />
+          <WalletBalance 
+            userId={user.userId} 
+            userRole={userRole}
+            onWithdrawClick={() => setShowWithdrawModal(true)}
+          />
         </div>
 
         {/* Transaction History */}
         <TransactionHistory userId={user.userId} />
       </div>
 
-      {/* Withdraw Modal (placeholder) */}
+      {/* Withdraw Modal */}
       {showWithdrawModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-4">Withdraw Funds</h2>
-            <p className="text-gray-600 mb-6">Withdrawal feature coming soon!</p>
-            <button
-              onClick={() => setShowWithdrawModal(false)}
-              className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <WithdrawFunds
+          isOpen={showWithdrawModal}
+          onClose={() => setShowWithdrawModal(false)}
+          availableBalance={availableBalance}
+          onSuccess={() => {
+            // Refresh balance after withdrawal
+            window.location.reload();
+          }}
+        />
       )}
     </div>
   );

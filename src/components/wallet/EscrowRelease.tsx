@@ -40,13 +40,17 @@ const EscrowRelease: React.FC<EscrowReleaseProps> = ({
     try {
       setLoading(true);
 
-      await escrowService.releaseEscrow({
-        escrowId,
-        releaseTo: studentId,
-        notes: `Payment released for job: ${jobTitle}`,
-      });
+      // FOR DEMO VIDEO: Simulate escrow release
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // await escrowService.releaseEscrow({
+      //   escrowId,
+      //   releaseTo: studentId,
+      //   notes: `Payment released for job: ${jobTitle}`,
+      // });
 
       toast.success('Payment released to student successfully!');
+      toast.info(`$${studentReceives.toFixed(2)} transferred to student's wallet`);
       onSuccess?.();
       onClose();
     } catch (error: any) {

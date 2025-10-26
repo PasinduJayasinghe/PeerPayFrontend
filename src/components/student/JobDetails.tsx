@@ -122,12 +122,17 @@ const JobDetails: React.FC = () => {
 
     try {
       setApplying(true);
-      await jobService.applyForJob({
-        jobId: id,
-        studentId: user.userId,
-        coverLetter: coverLetter.trim(),
-        attachments: attachments.length > 0 ? attachments : undefined
-      });
+      
+      // FOR DEMO VIDEO: Skip API call and show success message directly
+      // await jobService.applyForJob({
+      //   jobId: id,
+      //   studentId: user.userId,
+      //   coverLetter: coverLetter.trim(),
+      //   attachments: attachments.length > 0 ? attachments : undefined
+      // });
+
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       toast.success('Application submitted successfully!');
       setHasApplied(true);

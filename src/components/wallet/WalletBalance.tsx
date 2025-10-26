@@ -7,9 +7,10 @@ import { toast } from 'sonner';
 interface WalletBalanceProps {
   userId: string;
   userRole: 'student' | 'employer';
+  onWithdrawClick?: () => void;
 }
 
-const WalletBalance: React.FC<WalletBalanceProps> = ({ userId, userRole }) => {
+const WalletBalance: React.FC<WalletBalanceProps> = ({ userId, userRole, onWithdrawClick }) => {
   const [balance, setBalance] = useState<WalletBalanceType | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -17,8 +18,22 @@ const WalletBalance: React.FC<WalletBalanceProps> = ({ userId, userRole }) => {
   const fetchBalance = async () => {
     try {
       setRefreshing(true);
-      const data = await escrowService.getWalletBalance(userId);
-      setBalance(data);
+      
+      // FOR DEMO VIDEO: Use mock data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const mockBalance: WalletBalanceType = {
+        userId: userId,
+        availableBalance: userRole === 'student' ? 2500.00 : 500.00,
+        escrowedBalance: userRole === 'student' ? 1200.00 : 3500.00,
+        totalEarnings: userRole === 'student' ? 8750.00 : 0,
+        totalSpent: userRole === 'employer' ? 12000.00 : 0,
+        currency: '$',
+        lastUpdated: new Date().toISOString()
+      };
+      setBalance(mockBalance);
+      
+      // const data = await escrowService.getWalletBalance(userId);
+      // setBalance(data);
     } catch (error: any) {
       console.error('Failed to fetch wallet balance:', error);
       toast.error(error.response?.data?.message || 'Failed to load wallet balance');
@@ -151,7 +166,10 @@ const WalletBalance: React.FC<WalletBalanceProps> = ({ userId, userRole }) => {
       {/* Actions */}
       {userRole === 'student' && balance.availableBalance > 0 && (
         <div className="mt-6 flex gap-3">
-          <button className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-md">
+          <button 
+            onClick={onWithdrawClick}
+            className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-md"
+          >
             Withdraw Funds
           </button>
           <button className="px-6 py-3 border-2 border-purple-300 text-purple-700 font-semibold rounded-lg hover:bg-purple-50 transition-colors">
