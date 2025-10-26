@@ -1,12 +1,24 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 import ChatInterface from '../components/messaging/ChatInterface';
 
 const ChatPage: React.FC = () => {
-  // TODO: Get actual user data from auth context/store
-  const currentUserId = localStorage.getItem('userId') || 'temp-user-id';
-  const currentUserName = localStorage.getItem('userName') || 'Current User';
+  const { user } = useAuthStore();
+  const navigate = useNavigate();
 
-  return <ChatInterface currentUserId={currentUserId} currentUserName={currentUserName} />;
+  // Redirect to login if not authenticated
+  React.useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  if (!user) {
+    return null;
+  }
+
+  return <ChatInterface currentUserId={user.userId} currentUserName={user.name} />;
 };
 
 export default ChatPage;

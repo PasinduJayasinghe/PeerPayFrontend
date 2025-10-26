@@ -19,7 +19,7 @@ import StudentProfile from './components/student/StudentProfile.tsx'
 // // Employer Components
 import EmployerDashboard from './components/employer/EmployerDashboard.tsx'
 import PostJob from './components/employer/PostJob.tsx'
-// import ManageApplications from './components/employer/ManageApplications.tsx'
+import ManageApplications from './components/employer/ManageApplications.tsx'
 
 // // Admin Components             
  import AdminDashboard from './components/admin/AdminDashboard.tsx'
@@ -29,6 +29,19 @@ import PostJob from './components/employer/PostJob.tsx'
 // Messaging Pages
 import MessagesPage from './pages/MessagesPage.tsx'
 import ChatPage from './pages/ChatPage.tsx'
+
+// Footer Pages
+import AboutUs from './pages/AboutUs.tsx'
+import Contact from './pages/Contact.tsx'
+import HelpSupport from './pages/HelpSupport.tsx'
+import TrustSafety from './pages/TrustSafety.tsx'
+import HowToHire from './pages/HowToHire.tsx'
+import HowToFindWork from './pages/HowToFindWork.tsx'
+import TalentMarketplace from './pages/TalentMarketplace.tsx'
+import ProjectCatalog from './pages/ProjectCatalog.tsx'
+import Enterprise from './pages/Enterprise.tsx'
+import DirectContracts from './pages/DirectContracts.tsx'
+import FindFreelanceJobs from './pages/FindFreelanceJobs.tsx'
 
 // Common
 import Home from './pages/Home.tsx'
@@ -57,11 +70,28 @@ const App: React.FC = () => {
 
           <Route path="/employer/dashboard" element={<EmployerDashboard />} />
           <Route path="/employer/jobs/create" element={<PostJob />} />
-          {/* <Route path="/employer/applications" element={<ManageApplications />} /> */}
+          <Route path="/employer/jobs/:jobId/applications" element={<ManageApplications />} />
 
           {/* Messaging Routes */}
           <Route path="/messages" element={<MessagesPage />} />
           <Route path="/messages/:conversationId" element={<ChatPage />} />
+
+          {/* Footer Pages */}
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/help" element={<HelpSupport />} />
+          <Route path="/trust-safety" element={<TrustSafety />} />
+          
+          {/* For Clients Pages */}
+          <Route path="/how-to-hire" element={<HowToHire />} />
+          <Route path="/talent-marketplace" element={<TalentMarketplace />} />
+          <Route path="/project-catalog" element={<ProjectCatalog />} />
+          <Route path="/enterprise" element={<Enterprise />} />
+          
+          {/* For Talent Pages */}
+          <Route path="/how-to-find-work" element={<HowToFindWork />} />
+          <Route path="/direct-contracts" element={<DirectContracts />} />
+          <Route path="/find-freelance-jobs" element={<FindFreelanceJobs />} />
 
            <Route path="/admin/dashboard" element={<AdminDashboard />} />
           {/* <Route path="/admin/verification" element={<VerificationQueue />} />

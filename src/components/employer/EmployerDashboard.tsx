@@ -10,7 +10,8 @@ import {
   LogOut,
   User,
   TrendingUp,
-  Clock
+  Clock,
+  MessageCircle
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useDashboardData } from '../../services/dashboardService';
@@ -88,6 +89,13 @@ const EmployerDashboard: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <button 
+                onClick={() => navigate('/messages')}
+                className="p-2 text-gray-600 hover:text-[#8C00FF] transition"
+                title="Messages"
+              >
+                <MessageCircle className="w-6 h-6" />
+              </button>
               <button 
                 onClick={() => navigate('/employer/notifications')}
                 className="relative p-2 text-gray-600 hover:text-[#8C00FF] transition"

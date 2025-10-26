@@ -57,6 +57,7 @@ interface EmployerJobOverview {
 
 // ============ EMPLOYER - MANAGE APPLICATIONS (TypeScript) ============
 const EmployerManageApplications: React.FC = () => {
+    const navigate = useNavigate();
     const [applications] = useState<ApplicationCandidate[]>([
         {
             id: 1,

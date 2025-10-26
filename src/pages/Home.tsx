@@ -390,27 +390,27 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">For Clients</h4>
               <ul className="space-y-2 text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">How to Hire</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Talent Marketplace</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Project Catalog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Enterprise</a></li>
+                <li><button onClick={() => navigate('/how-to-hire')} className="hover:text-white transition-colors">How to Hire</button></li>
+                <li><button onClick={() => navigate('/talent-marketplace')} className="hover:text-white transition-colors">Talent Marketplace</button></li>
+                <li><button onClick={() => navigate('/project-catalog')} className="hover:text-white transition-colors">Project Catalog</button></li>
+                <li><button onClick={() => navigate('/enterprise')} className="hover:text-white transition-colors">Enterprise</button></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">For Talent</h4>
               <ul className="space-y-2 text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">How to Find Work</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Direct Contracts</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Find Freelance Jobs</a></li>
+                <li><button onClick={() => navigate('/how-to-find-work')} className="hover:text-white transition-colors">How to Find Work</button></li>
+                <li><button onClick={() => navigate('/direct-contracts')} className="hover:text-white transition-colors">Direct Contracts</button></li>
+                <li><button onClick={() => navigate('/find-freelance-jobs')} className="hover:text-white transition-colors">Find Freelance Jobs</button></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Help & Support</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Trust & Safety</a></li>
+                <li><button onClick={() => navigate('/about')} className="hover:text-white transition-colors">About Us</button></li>
+                <li><button onClick={() => navigate('/contact')} className="hover:text-white transition-colors">Contact</button></li>
+                <li><button onClick={() => navigate('/help')} className="hover:text-white transition-colors">Help & Support</button></li>
+                <li><button onClick={() => navigate('/trust-safety')} className="hover:text-white transition-colors">Trust & Safety</button></li>
               </ul>
             </div>
           </div>

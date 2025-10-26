@@ -101,7 +101,7 @@ export interface UserResponseDto {
 
 // Job related types
 export type JobStatus = 'Active' | 'Closed' | 'Completed' | 'Cancelled';
-export type ApplicationStatus = 'Submitted' | 'UnderReview' | 'Shortlisted' | 'Selected' | 'Rejected' | 'Withdrawn';
+export type ApplicationStatus = 'Pending' | 'Submitted' | 'UnderReview' | 'Shortlisted' | 'Accepted' | 'Selected' | 'Rejected' | 'Withdrawn';
 export type PayType = 'Hourly' | 'Daily' | 'Weekly' | 'Monthly' | 'Fixed';
 export type JobType = 'FullTime' | 'PartTime' | 'ProjectBased' | 'Freelance';
 
@@ -126,6 +126,7 @@ export interface Job {
 }
 
 export interface JobApplication {
+  applicationId: string;
   id: string;
   jobId: string;
   jobTitle?: string;
