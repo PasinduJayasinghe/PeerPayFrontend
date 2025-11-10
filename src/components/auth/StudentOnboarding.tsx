@@ -100,9 +100,14 @@ const StudentOnboarding: React.FC = () => {
 
     setIsVerifying(true);
     try {
-      await authService.sendOtp(email);
+      // FOR DEMO VIDEO: Simulate OTP sending
+      await new Promise(resolve => setTimeout(resolve, 1000));
       toast.success(`OTP sent to ${email}`);
+      toast.info('Demo OTP: 123456', { duration: 5000 });
       setOtpSent(true);
+      
+      // Original API call (commented for demo):
+      // await authService.sendOtp(email);
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to send OTP');
       console.error(error);
@@ -120,9 +125,13 @@ const StudentOnboarding: React.FC = () => {
 
     setIsVerifying(true);
     try {
-      await authService.verifyOtp(email, otp);
+      // FOR DEMO VIDEO: Accept any 6-digit OTP
+      await new Promise(resolve => setTimeout(resolve, 800));
       toast.success('Email verified successfully!');
-      setCurrentStep(3);
+      // Don't change step here - let the form submission handle it
+      
+      // Original API call (commented for demo):
+      // await authService.verifyOtp(email, otp);
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Invalid OTP');
       console.error(error);
@@ -163,13 +172,13 @@ const StudentOnboarding: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 lg:py-16 xl:py-20 px-4 sm:px-6 lg:px-8">
       {/* Container */}
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">PeerPay.lk</h1>
-          <p className="text-gray-600">Join as a Student</p>
+        <div className="text-center mb-8 lg:mb-12">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-blue-600 mb-2 lg:mb-4">PeerPay.lk</h1>
+          <p className="text-gray-600 text-base lg:text-lg xl:text-xl">Join as a Student</p>
         </div>
 
         {/* Progress Steps */}

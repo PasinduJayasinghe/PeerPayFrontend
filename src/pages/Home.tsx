@@ -161,28 +161,28 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden text-white py-20" style={{
+      <section className="relative overflow-hidden text-white py-20 lg:py-32 xl:py-40" style={{
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${BannerImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}>
         <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:32px_32px]"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+        <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 relative">
+          <div className="text-center max-w-4xl xl:max-w-5xl mx-auto">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 lg:mb-8 leading-tight">
               Find the Perfect Freelancer or Your Next Job
             </h1>
-            <p className="text-xl text-gray-100 mb-10">
+            <p className="text-xl lg:text-2xl xl:text-3xl text-gray-100 mb-10 lg:mb-14">
               Connect with talented professionals worldwide. Post jobs, hire talent, or find work that matches your skills.
             </p>
 
             {/* Tab Switcher */}
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center mb-8 lg:mb-12">
               <div className="bg-white/10 backdrop-blur-sm rounded-full p-1 inline-flex">
                 <button
                   onClick={() => setActiveTab('hire')}
-                  className={`px-8 py-3 rounded-full font-medium transition-all ${
+                  className={`px-8 lg:px-12 py-3 lg:py-4 rounded-full font-medium text-base lg:text-lg transition-all ${
                     activeTab === 'hire' ? 'bg-white text-[#8C00FF] shadow-lg' : 'text-white hover:bg-white/20'
                   }`}
                 >
@@ -190,7 +190,7 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => setActiveTab('work')}
-                  className={`px-8 py-3 rounded-full font-medium transition-all ${
+                  className={`px-8 lg:px-12 py-3 lg:py-4 rounded-full font-medium text-base lg:text-lg transition-all ${
                     activeTab === 'work' ? 'bg-white text-[#8C00FF] shadow-lg' : 'text-white hover:bg-white/20'
                   }`}
                 >
@@ -200,17 +200,17 @@ export default function Home() {
             </div>
 
             {/* Search Bar */}
-            <div className="max-w-3xl mx-auto">
-              <div className="bg-white rounded-full shadow-2xl p-2 flex items-center">
-                <Search className="ml-4 text-slate-400" size={24} />
+            <div className="max-w-3xl xl:max-w-4xl mx-auto">
+              <div className="bg-white rounded-full shadow-2xl p-2 lg:p-3 flex items-center">
+                <Search className="ml-4 text-slate-400" size={28} />
                 <input
                   type="text"
                   placeholder={activeTab === 'hire' ? 'Search for freelancers or skills...' : 'Search for jobs...'}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 px-4 py-3 text-slate-800 outline-none text-lg"
+                  className="flex-1 px-4 lg:px-6 py-3 lg:py-4 text-slate-800 outline-none text-lg lg:text-xl"
                 />
-                <button className="bg-[#8C00FF] text-white px-8 py-3 rounded-full hover:bg-[#7000CC] transition-all font-medium shadow-lg">
+                <button className="bg-[#8C00FF] text-white px-8 lg:px-12 py-3 lg:py-4 rounded-full hover:bg-[#7000CC] transition-all font-medium text-base lg:text-lg shadow-lg">
                   Search
                 </button>
               </div>
@@ -227,21 +227,50 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-12 bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="flex justify-center mb-3">
-                  <div className="bg-purple-50 p-3 rounded-full">
-                    <stat.icon className="text-[#8C00FF]" size={28} />
-                  </div>
+      {/* Why Choose PeerPay Section */}
+      <section className="py-16 lg:py-24 xl:py-32 bg-white border-b border-slate-200">
+        <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+          <div className="text-center mb-12 lg:mb-16">
+            <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-slate-800 mb-4 lg:mb-6">Why Choose PeerPay?</h2>
+            <p className="text-slate-600 text-lg lg:text-xl xl:text-2xl">Sri Lanka's trusted platform for freelance opportunities</p>
+          </div>
+          <div className="grid md:grid-cols-4 gap-8 lg:gap-10 xl:gap-12">
+            <div className="text-center group hover:scale-105 transition-transform">
+              <div className="flex justify-center mb-4">
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-2xl group-hover:shadow-lg transition-shadow">
+                  <Shield className="text-[#8C00FF]" size={32} />
                 </div>
-                <div className="text-3xl font-bold text-slate-800">{stat.value}</div>
-                <div className="text-slate-600 mt-1">{stat.label}</div>
               </div>
-            ))}
+              <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-800 mb-2 lg:mb-3">Secure Payments</h3>
+              <p className="text-slate-600 text-sm lg:text-base xl:text-lg">Escrow protection ensures safe transactions for both parties</p>
+            </div>
+            <div className="text-center group hover:scale-105 transition-transform">
+              <div className="flex justify-center mb-4">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-2xl group-hover:shadow-lg transition-shadow">
+                  <Clock className="text-blue-600" size={32} />
+                </div>
+              </div>
+              <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-800 mb-2 lg:mb-3">Fast Matching</h3>
+              <p className="text-slate-600 text-sm lg:text-base xl:text-lg">Connect with the right talent or jobs quickly and efficiently</p>
+            </div>
+            <div className="text-center group hover:scale-105 transition-transform">
+              <div className="flex justify-center mb-4">
+                <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-2xl group-hover:shadow-lg transition-shadow">
+                  <Star className="text-green-600" size={32} />
+                </div>
+              </div>
+              <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-800 mb-2 lg:mb-3">Quality Work</h3>
+              <p className="text-slate-600 text-sm lg:text-base xl:text-lg">Verified students and employers ensure high-quality projects</p>
+            </div>
+            <div className="text-center group hover:scale-105 transition-transform">
+              <div className="flex justify-center mb-4">
+                <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-2xl group-hover:shadow-lg transition-shadow">
+                  <Award className="text-orange-600" size={32} />
+                </div>
+              </div>
+              <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-slate-800 mb-2 lg:mb-3">Local Focus</h3>
+              <p className="text-slate-600 text-sm lg:text-base xl:text-lg">Built specifically for Sri Lankan students and businesses</p>
+            </div>
           </div>
         </div>
       </section>
@@ -289,56 +318,52 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Top Freelancers Section */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-12">
-            <div>
-              <h2 className="text-4xl font-bold text-slate-800 mb-2">Top Rated Freelancers</h2>
-              <p className="text-slate-600 text-lg">Hire the best talent for your projects</p>
-            </div>
-            <button 
-              onClick={() => navigate('/student/talent')}
-              className="flex items-center text-[#8C00FF] hover:text-[#7000CC] font-medium"
-            >
-              View All <ChevronRight size={20} />
-            </button>
+      {/* Popular Skills & Opportunities Section */}
+      <section className="py-16 lg:py-24 xl:py-32 bg-slate-50">
+        <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+          <div className="text-center mb-12 lg:mb-16">
+            <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-slate-800 mb-2 lg:mb-4">Explore Opportunities</h2>
+            <p className="text-slate-600 text-lg lg:text-xl xl:text-2xl">Find the perfect match for your skills or project needs</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 xl:gap-10">
             {[
-              { name: 'Sarah Johnson', role: 'Full Stack Developer', rating: 4.9, jobs: 127, hourlyRate: 85, avatar: '👩‍💻', skills: ['React', 'Node.js', 'AWS'] },
-              { name: 'Michael Chen', role: 'UI/UX Designer', rating: 5.0, jobs: 93, hourlyRate: 75, avatar: '👨‍🎨', skills: ['Figma', 'Adobe XD', 'Prototyping'] },
-              { name: 'Emma Williams', role: 'Content Writer', rating: 4.8, jobs: 156, hourlyRate: 55, avatar: '👩‍💼', skills: ['SEO', 'Blog Writing', 'Copywriting'] },
-              { name: 'David Kumar', role: 'Mobile Developer', rating: 4.9, jobs: 82, hourlyRate: 90, avatar: '👨‍💻', skills: ['React Native', 'Flutter', 'iOS'] },
-            ].map((freelancer, index) => (
-              <div key={index} className="bg-white rounded-2xl p-6 border border-slate-200 hover:shadow-xl transition-all">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="text-5xl">{freelancer.avatar}</div>
-                  <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-full">
-                    <Star className="text-yellow-500 fill-yellow-500" size={16} />
-                    <span className="ml-1 font-semibold text-sm">{freelancer.rating}</span>
-                  </div>
+              { title: 'Web Development', icon: '💻', color: 'from-blue-500 to-cyan-500', skills: ['React', 'Node.js', 'Python', 'PHP'], description: 'Build modern websites and applications' },
+              { title: 'Mobile Apps', icon: '📱', color: 'from-purple-500 to-pink-500', skills: ['React Native', 'Flutter', 'iOS', 'Android'], description: 'Create mobile experiences' },
+              { title: 'Design & Creative', icon: '🎨', color: 'from-orange-500 to-red-500', skills: ['UI/UX', 'Figma', 'Photoshop', 'Branding'], description: 'Bring ideas to visual life' },
+              { title: 'Content & Writing', icon: '✍️', color: 'from-green-500 to-teal-500', skills: ['Blog Writing', 'SEO', 'Copywriting', 'Social Media'], description: 'Engage audiences with words' },
+              { title: 'Digital Marketing', icon: '📊', color: 'from-yellow-500 to-orange-500', skills: ['SEO', 'Social Media', 'Analytics', 'Ads'], description: 'Grow your online presence' },
+              { title: 'Video & Animation', icon: '🎬', color: 'from-red-500 to-pink-500', skills: ['Video Editing', 'Motion Graphics', 'Animation'], description: 'Create engaging visual content' },
+              { title: 'Data & Analytics', icon: '📈', color: 'from-indigo-500 to-purple-500', skills: ['Excel', 'Data Entry', 'SQL', 'Reporting'], description: 'Transform data into insights' },
+              { title: 'Virtual Assistant', icon: '🤝', color: 'from-cyan-500 to-blue-500', skills: ['Admin', 'Support', 'Scheduling', 'Communication'], description: 'Provide professional support' },
+            ].map((category, index) => (
+              <div 
+                key={index} 
+                className="group bg-white rounded-2xl p-6 lg:p-8 xl:p-10 border border-slate-200 hover:shadow-2xl transition-all cursor-pointer hover:-translate-y-1"
+                onClick={() => navigate('/student/jobs')}
+              >
+                <div className={`w-16 h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 bg-gradient-to-br ${category.color} rounded-2xl flex items-center justify-center text-3xl lg:text-4xl xl:text-5xl mb-4 lg:mb-6 group-hover:scale-110 transition-transform`}>
+                  {category.icon}
                 </div>
-                <h3 className="font-bold text-slate-800 mb-1">{freelancer.name}</h3>
-                <p className="text-slate-600 text-sm mb-4">{freelancer.role}</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {freelancer.skills.map((skill, i) => (
-                    <span key={i} className="bg-purple-50 text-[#8C00FF] px-3 py-1 rounded-full text-xs font-medium">
+                <h3 className="font-bold text-slate-800 text-lg lg:text-xl xl:text-2xl mb-2 lg:mb-3">{category.title}</h3>
+                <p className="text-slate-600 text-sm lg:text-base xl:text-lg mb-4 lg:mb-6">{category.description}</p>
+                <div className="flex flex-wrap gap-2">
+                  {category.skills.slice(0, 3).map((skill, i) => (
+                    <span key={i} className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-medium group-hover:bg-purple-50 group-hover:text-[#8C00FF] transition-colors">
                       {skill}
                     </span>
                   ))}
                 </div>
-                <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-                  <div>
-                    <div className="text-2xl font-bold text-slate-800">${freelancer.hourlyRate}</div>
-                    <div className="text-xs text-slate-500">per hour</div>
-                  </div>
-                  <button className="bg-[#8C00FF] text-white px-4 py-2 rounded-lg hover:bg-[#7000CC] transition-all text-sm font-medium">
-                    Hire Now
-                  </button>
-                </div>
               </div>
             ))}
+          </div>
+          <div className="text-center mt-12 lg:mt-16">
+            <button 
+              onClick={() => navigate('/student/jobs')}
+              className="inline-flex items-center bg-[#8C00FF] text-white px-8 lg:px-12 xl:px-16 py-4 lg:py-5 xl:py-6 text-base lg:text-lg xl:text-xl rounded-full hover:bg-[#7000CC] transition-all font-medium shadow-lg hover:shadow-xl"
+            >
+              Browse All Categories
+              <ArrowRight className="ml-2 lg:ml-3" size={24} />
+            </button>
           </div>
         </div>
       </section>
@@ -474,11 +499,11 @@ export default function Home() {
           <p className="text-xl text-gray-100 mb-8">
             Join thousands of professionals who trust PeerPay for their freelance needs
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-[#8C00FF] px-8 py-4 rounded-full hover:bg-gray-50 transition-all font-semibold text-lg shadow-xl">
+          <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center">
+            <button className="bg-white text-[#8C00FF] px-8 lg:px-12 xl:px-16 py-4 lg:py-5 xl:py-6 rounded-full hover:bg-gray-50 transition-all font-semibold text-lg lg:text-xl xl:text-2xl shadow-xl">
               Post a Job
             </button>
-            <button className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full hover:bg-white hover:text-[#8C00FF] transition-all font-semibold text-lg">
+            <button className="bg-transparent border-2 border-white text-white px-8 lg:px-12 xl:px-16 py-4 lg:py-5 xl:py-6 rounded-full hover:bg-white hover:text-[#8C00FF] transition-all font-semibold text-lg lg:text-xl xl:text-2xl">
               Find Work
             </button>
           </div>
@@ -486,9 +511,9 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+      <footer className="bg-slate-900 text-white py-12 lg:py-16 xl:py-20">
+        <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+          <div className="grid md:grid-cols-4 gap-8 lg:gap-10 xl:gap-12 mb-8 lg:mb-12">
             <div>
               <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#8C00FF] to-[#FFC400] bg-clip-text text-transparent">
                 PeerPay
@@ -523,7 +548,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-slate-800 pt-8 text-center text-slate-400">
-            <p>&copy; 2024 PeerPay. All rights reserved.</p>
+            <p>&copy; 2025 PeerPay. All rights reserved.</p>
           </div>
         </div>
       </footer>

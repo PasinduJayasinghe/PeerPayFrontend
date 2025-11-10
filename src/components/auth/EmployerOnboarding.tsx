@@ -69,14 +69,14 @@ const EmployerOnboarding: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">PeerPay.lk</h1>
-          <p className="text-gray-600">Register Your Business</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 lg:py-16 xl:py-20 px-4">
+      <div className="max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto">
+        <div className="text-center mb-8 lg:mb-12">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-blue-600 mb-2 lg:mb-4">PeerPay.lk</h1>
+          <p className="text-gray-600 text-base lg:text-lg xl:text-xl">Register Your Business</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-8 space-y-6">
+        <div className="bg-white rounded-lg shadow-lg p-8 lg:p-10 xl:p-12 space-y-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {currentStep === 1 && (
               <div className="space-y-6">

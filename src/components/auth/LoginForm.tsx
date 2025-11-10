@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services';
 import { useAuthService } from '../../hooks/useService';
@@ -89,19 +89,27 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md lg:max-w-lg xl:max-w-xl">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-blue-600 mb-2">PeerPay.lk</h1>
-          <p className="text-gray-600">Sign in to your account</p>
+          <h1 className="text-4xl lg:text-5xl font-bold text-blue-600 mb-2">PeerPay.lk</h1>
+          <p className="text-gray-600 text-base lg:text-lg">Sign in to your account</p>
         </div>
+
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center text-blue-600 hover:text-blue-700 font-medium mb-6 transition-colors group"
+        >
+          <Home size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+          Back to Home
+        </button>
 
         <div className="flex gap-4 mb-8">
           {['student', 'employer', 'admin'].map((type) => (
             <button
               key={type}
               onClick={() => setUserType(type as 'student' | 'employer' | 'admin')}
-              className={`flex-1 px-4 py-3 rounded-lg font-bold transition capitalize ${
+              className={`flex-1 px-4 py-3 lg:py-4 rounded-lg font-bold transition capitalize text-sm lg:text-base ${
                 userType === type
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-gray-700 border border-gray-300'
@@ -112,7 +120,7 @@ const LoginForm: React.FC = () => {
           ))}
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-8 space-y-6">
+        <div className="bg-white rounded-lg shadow-lg p-8 lg:p-10 space-y-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -131,7 +139,7 @@ const LoginForm: React.FC = () => {
                       return emailRegex.test(value) || phoneRegex.test(value) || 'Enter a valid email or phone number';
                     },
                   })}
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full pl-10 pr-4 py-2 lg:py-3 text-sm lg:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     errors.emailOrPhone ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -152,7 +160,7 @@ const LoginForm: React.FC = () => {
                     required: 'Password is required',
                     minLength: { value: 6, message: 'Password must be at least 6 characters' },
                   })}
-                  className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full pl-10 pr-10 py-2 lg:py-3 text-sm lg:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     errors.password ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -175,7 +183,7 @@ const LoginForm: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 disabled:bg-blue-400 transition flex items-center justify-center gap-2"
+              className="w-full px-4 py-3 lg:py-4 text-sm lg:text-base bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 disabled:bg-blue-400 transition flex items-center justify-center gap-2"
             >
               {loading ? 'Signing in...' : 'Sign In'} <ArrowRight size={18} />
             </button>

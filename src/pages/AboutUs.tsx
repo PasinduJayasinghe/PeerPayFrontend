@@ -22,10 +22,12 @@ const AboutUs: React.FC = () => {
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <img src={PeerPayLogo} alt="PeerPay Logo" className="h-12 w-auto" />
-              <span className="text-2xl font-bold text-[#8C00FF]">PeerPay</span>
-            </div>
+            <img 
+              src={PeerPayLogo} 
+              alt="PeerPay Logo" 
+              className="h-12 w-auto cursor-pointer" 
+              onClick={() => navigate('/')}
+            />
             <button
               onClick={() => navigate('/')}
               className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-[#8C00FF] transition"
@@ -211,7 +213,7 @@ const AboutUs: React.FC = () => {
             </h3>
             <p className="text-lg text-gray-700 leading-relaxed">
               To develop <strong>PeerPay.lk</strong>, a comprehensive web-based platform using modern 
-              technologies (React with Vite, .NET Core, Azure cloud services with MySQL database) that 
+              technologies (React with Vite, .NET Core, Azure cloud services with MSSQL database) that 
               creates a <strong>secure, verified micro-job marketplace</strong> specifically designed 
               for Sri Lankan undergraduates, incorporating escrow payment protection, reputation systems, 
               and intelligent job matching to enable flexible income generation while maintaining academic excellence.
@@ -256,7 +258,7 @@ const AboutUs: React.FC = () => {
                 <h4 className="font-bold text-gray-900 mb-2">Cloud-Native Infrastructure</h4>
                 <p className="text-gray-600">
                   Establish a cloud-native infrastructure on <strong>Microsoft Azure</strong>, utilizing Azure App Service 
-                  for hosting, Azure SQL Database for MySQL, Azure Blob Storage for file management, and Azure Key Vault for secrets.
+                  for hosting, Azure SQL Database for MSSQL, Azure Blob Storage for file management, and Azure Key Vault for secrets.
                 </p>
               </div>
             </div>
@@ -320,7 +322,7 @@ const AboutUs: React.FC = () => {
             </div>
             <div className="bg-white p-6 rounded-xl shadow-sm text-center">
               <div className="text-4xl mb-3">🗄️</div>
-              <h4 className="font-bold text-gray-900 mb-2">MySQL Database</h4>
+              <h4 className="font-bold text-gray-900 mb-2">MSSQL Database</h4>
               <p className="text-sm text-gray-600">Reliable data storage</p>
             </div>
           </div>
