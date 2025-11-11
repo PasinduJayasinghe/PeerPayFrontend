@@ -8,6 +8,7 @@ import {
   UserCheck,
   Building2,
   GraduationCap,
+  X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
@@ -16,11 +17,14 @@ import {
 } from '../../services/adminService.ts';
 import PeerPayLogo from '../../assets/images/PeerPayLogo.png';
 
+type DetailModalType = 'employer' | 'student' | 'job' | 'application' | null;
 
 const AdminDashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<AdminDashboardData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  
+  const [detailModal, setDetailModal] = useState<{ type: DetailModalType; data: any }>({ type: null, data: null });
 
 
   const colors = {
@@ -52,6 +56,8 @@ const AdminDashboard: React.FC = () => {
   };
 
   
+
+  
   const handleRefresh = async (): Promise<void> => {
     setRefreshing(true);
     await fetchDashboardData();
@@ -81,6 +87,245 @@ const AdminDashboard: React.FC = () => {
 
   const formatCurrency = (amount: number): string => {
     return `₨${amount.toLocaleString()}`;
+  };
+
+  
+  const openDetailModal = (type: DetailModalType, data: any) => {
+    setDetailModal({ type, data });
+  };
+
+  const closeDetailModal = () => {
+    setDetailModal({ type: null, data: null });
+  };
+
+  const renderDetailModal = () => {
+    if (!detailModal.type || !detailModal.data) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={closeDetailModal}>
+        <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-800">
+              {detailModal.type === 'employer' && 'Employer Details'}
+              {detailModal.type === 'student' && 'Student Details'}
+              {detailModal.type === 'job' && 'Job Details'}
+              {detailModal.type === 'application' && 'Application Details'}
+            </h2>
+            <button onClick={closeDetailModal} className="text-gray-500 hover:text-gray-700">
+              <X size={24} />
+            </button>
+          </div>
+
+          <div className="p-6">
+            {detailModal.type === 'employer' && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Company Name</label>
+                    <p className="text-gray-800">{detailModal.data.companyName}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Email</label>
+                    <p className="text-gray-800">{detailModal.data.email}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Contact Number</label>
+                    <p className="text-gray-800">{detailModal.data.contactNumber || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Industry</label>
+                    <p className="text-gray-800">{detailModal.data.industry || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Verification Status</label>
+                    <p className={`font-semibold ${detailModal.data.verificationStatus === 'Verified' ? 'text-green-600' : 'text-gray-600'}`}>
+                      {detailModal.data.verificationStatus}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Registered</label>
+                    <p className="text-gray-800">{new Date(detailModal.data.createdAt).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                {detailModal.data.companyDescription && (
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Company Description</label>
+                    <p className="text-gray-800">{detailModal.data.companyDescription}</p>
+                  </div>
+                )}
+                {detailModal.data.website && (
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Website</label>
+                    <a href={detailModal.data.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      {detailModal.data.website}
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {detailModal.type === 'student' && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Name</label>
+                    <p className="text-gray-800">{detailModal.data.name}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Email</label>
+                    <p className="text-gray-800">{detailModal.data.email}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">University</label>
+                    <p className="text-gray-800">{detailModal.data.university}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Course</label>
+                    <p className="text-gray-800">{detailModal.data.course}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Year of Study</label>
+                    <p className="text-gray-800">{detailModal.data.yearOfStudy || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Contact Number</label>
+                    <p className="text-gray-800">{detailModal.data.contactNumber || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Registered</label>
+                    <p className="text-gray-800">{new Date(detailModal.data.createdAt).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                {detailModal.data.bio && (
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Bio</label>
+                    <p className="text-gray-800">{detailModal.data.bio}</p>
+                  </div>
+                )}
+                {detailModal.data.skills && detailModal.data.skills.length > 0 && (
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Skills</label>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {detailModal.data.skills.map((skill: string, idx: number) => (
+                        <span key={idx} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {detailModal.type === 'job' && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <label className="text-sm font-semibold text-gray-600">Title</label>
+                    <p className="text-lg font-semibold text-gray-800">{detailModal.data.title}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Pay Amount</label>
+                    <p className="text-gray-800">{formatCurrency(detailModal.data.payAmount)}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Pay Type</label>
+                    <p className="text-gray-800">{detailModal.data.payType}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Duration</label>
+                    <p className="text-gray-800">{detailModal.data.durationDays} days</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Location</label>
+                    <p className="text-gray-800">{detailModal.data.location}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Job Type</label>
+                    <p className="text-gray-800">{detailModal.data.jobType}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Status</label>
+                    <p className={`font-semibold ${detailModal.data.status === 'Active' ? 'text-green-600' : 'text-gray-600'}`}>
+                      {detailModal.data.status}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Posted Date</label>
+                    <p className="text-gray-800">{new Date(detailModal.data.postedDate).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Deadline</label>
+                    <p className="text-gray-800">{new Date(detailModal.data.deadline).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-semibold text-gray-600">Description</label>
+                  <p className="text-gray-800 whitespace-pre-wrap">{detailModal.data.description}</p>
+                </div>
+                {detailModal.data.requiredSkills && detailModal.data.requiredSkills.length > 0 && (
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Required Skills</label>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {detailModal.data.requiredSkills.map((skill: string, idx: number) => (
+                        <span key={idx} className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {detailModal.type === 'application' && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Student Name</label>
+                    <p className="text-gray-800">{detailModal.data.studentName}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Job Title</label>
+                    <p className="text-gray-800">{detailModal.data.jobTitle}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Status</label>
+                    <p className={`font-semibold ${
+                      detailModal.data.status === 'Accepted' ? 'text-green-600' :
+                      detailModal.data.status === 'Rejected' ? 'text-red-600' :
+                      'text-yellow-600'
+                    }`}>
+                      {detailModal.data.status}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Applied Date</label>
+                    <p className="text-gray-800">{new Date(detailModal.data.appliedDate).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Status Updated</label>
+                    <p className="text-gray-800">{new Date(detailModal.data.statusUpdatedAt).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                {detailModal.data.coverLetter && (
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Cover Letter</label>
+                    <p className="text-gray-800 whitespace-pre-wrap bg-gray-50 p-4 rounded-lg">{detailModal.data.coverLetter}</p>
+                  </div>
+                )}
+                {detailModal.data.employerNotes && (
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600">Employer Notes</label>
+                    <p className="text-gray-800 whitespace-pre-wrap bg-yellow-50 p-4 rounded-lg">{detailModal.data.employerNotes}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const stats = dashboardData?.statistics;
@@ -197,7 +442,14 @@ const AdminDashboard: React.FC = () => {
             <div className="space-y-3">
               {dashboardData?.recentEmployers && dashboardData.recentEmployers.length > 0 ? (
                 dashboardData.recentEmployers.map((employer) => (
-                  <div key={employer.employerId} className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:shadow-md transition">
+                  <div
+                    key={employer.employerId}
+                    className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:shadow-md transition cursor-pointer"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => openDetailModal('employer', employer)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') openDetailModal('employer', employer); }}
+                  >
                     <Building2 size={18} className="text-gray-400 mt-1" />
                     <div className="flex-1">
                       <h4 className="font-semibold text-gray-800">{employer.companyName}</h4>
@@ -237,7 +489,14 @@ const AdminDashboard: React.FC = () => {
             <div className="space-y-3">
               {dashboardData?.recentStudents && dashboardData.recentStudents.length > 0 ? (
                 dashboardData.recentStudents.map((student) => (
-                  <div key={student.studentId} className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:shadow-md transition">
+                  <div
+                    key={student.studentId}
+                    className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:shadow-md transition cursor-pointer"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => openDetailModal('student', student)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') openDetailModal('student', student); }}
+                  >
                     <GraduationCap size={18} className="text-gray-400 mt-1" />
                     <div className="flex-1">
                       <h4 className="font-semibold text-gray-800">{student.name}</h4>
@@ -272,7 +531,14 @@ const AdminDashboard: React.FC = () => {
           <div className="space-y-3">
             {dashboardData?.recentJobs && dashboardData.recentJobs.length > 0 ? (
               dashboardData.recentJobs.map((job) => (
-                <div key={job.jobId} className="flex items-start gap-4 p-4 rounded-lg border border-gray-200 hover:shadow-md transition">
+                <div
+                  key={job.jobId}
+                  className="flex items-start gap-4 p-4 rounded-lg border border-gray-200 hover:shadow-md transition cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => openDetailModal('job', job)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') openDetailModal('job', job); }}
+                >
                   <Briefcase size={18} className="text-gray-400 mt-1" />
                   <div className="flex-1">
                     <div className="flex items-start justify-between">
@@ -315,7 +581,14 @@ const AdminDashboard: React.FC = () => {
           <div className="space-y-3">
               {dashboardData?.recentApplications && dashboardData.recentApplications.length > 0 ? (
               dashboardData.recentApplications.map((app) => (
-                <div key={app.id} className="flex items-start gap-4 p-4 rounded-lg border border-gray-200 hover:shadow-md transition">
+                <div
+                  key={app.id}
+                  className="flex items-start gap-4 p-4 rounded-lg border border-gray-200 hover:shadow-md transition cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => openDetailModal('application', app)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') openDetailModal('application', app); }}
+                >
                   <FileText size={18} className="text-gray-400 mt-1" />
                   <div className="flex-1">
                     <div className="flex items-start justify-between">
@@ -349,6 +622,7 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
       </main>
+      {renderDetailModal()}
     </div>
   );
 };
