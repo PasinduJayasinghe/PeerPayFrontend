@@ -9,8 +9,29 @@ import {
   Building2,
   GraduationCap,
   X,
+  Home,
+  TrendingUp,
+  BarChart3,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { 
   adminService, 
   type AdminDashboardData,
@@ -20,6 +41,7 @@ import PeerPayLogo from '../../assets/images/PeerPayLogo.png';
 type DetailModalType = 'employer' | 'student' | 'job' | 'application' | null;
 
 const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState<AdminDashboardData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -69,6 +91,58 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  // Generate mock analytics data based on current statistics
+  const generateAnalyticsData = () => {
+    const stats = dashboardData?.statistics;
+    if (!stats) return null;
+
+    // User Growth Trend (last 6 months)
+    const userGrowthData = [
+      { month: 'Jun', employers: Math.floor((stats.totalEmployers || 0) * 0.4), students: Math.floor((stats.totalStudents || 0) * 0.3), total: Math.floor((stats.totalEmployers || 0) * 0.4 + (stats.totalStudents || 0) * 0.3) },
+      { month: 'Jul', employers: Math.floor((stats.totalEmployers || 0) * 0.5), students: Math.floor((stats.totalStudents || 0) * 0.45), total: Math.floor((stats.totalEmployers || 0) * 0.5 + (stats.totalStudents || 0) * 0.45) },
+      { month: 'Aug', employers: Math.floor((stats.totalEmployers || 0) * 0.65), students: Math.floor((stats.totalStudents || 0) * 0.6), total: Math.floor((stats.totalEmployers || 0) * 0.65 + (stats.totalStudents || 0) * 0.6) },
+      { month: 'Sep', employers: Math.floor((stats.totalEmployers || 0) * 0.75), students: Math.floor((stats.totalStudents || 0) * 0.75), total: Math.floor((stats.totalEmployers || 0) * 0.75 + (stats.totalStudents || 0) * 0.75) },
+      { month: 'Oct', employers: Math.floor((stats.totalEmployers || 0) * 0.9), students: Math.floor((stats.totalStudents || 0) * 0.88), total: Math.floor((stats.totalEmployers || 0) * 0.9 + (stats.totalStudents || 0) * 0.88) },
+      { month: 'Nov', employers: stats.totalEmployers || 0, students: stats.totalStudents || 0, total: (stats.totalEmployers || 0) + (stats.totalStudents || 0) },
+    ];
+
+    // Application Status Breakdown
+    const applicationStatusData = [
+      { name: 'Pending', value: stats.pendingApplications || 0, color: '#F4E87C' },
+      { name: 'Accepted', value: Math.floor((stats.totalApplications || 0) * 0.4), color: '#9CADFF' },
+      { name: 'Rejected', value: Math.floor((stats.totalApplications || 0) * 0.3), color: '#FFBDE1' },
+      { name: 'In Review', value: (stats.totalApplications || 0) - (stats.pendingApplications || 0) - Math.floor((stats.totalApplications || 0) * 0.4) - Math.floor((stats.totalApplications || 0) * 0.3), color: '#E47DE4' },
+    ];
+
+    // Job Activity Data
+    const jobActivityData = [
+      { category: 'Active', count: stats.activeJobs || 0, fill: '#5469D4' },
+      { category: 'Completed', count: Math.floor((stats.totalJobs || 0) * 0.5), fill: '#9CADFF' },
+      { category: 'Cancelled', count: Math.floor((stats.totalJobs || 0) * 0.1), fill: '#FF5722' },
+      { category: 'Draft', count: (stats.totalJobs || 0) - (stats.activeJobs || 0) - Math.floor((stats.totalJobs || 0) * 0.5) - Math.floor((stats.totalJobs || 0) * 0.1), fill: '#F4E87C' },
+    ];
+
+    // Platform Activity Trend
+    const activityTrendData = [
+      { month: 'Jun', jobs: Math.floor((stats.totalJobs || 0) * 0.3), applications: Math.floor((stats.totalApplications || 0) * 0.25) },
+      { month: 'Jul', jobs: Math.floor((stats.totalJobs || 0) * 0.45), applications: Math.floor((stats.totalApplications || 0) * 0.4) },
+      { month: 'Aug', jobs: Math.floor((stats.totalJobs || 0) * 0.6), applications: Math.floor((stats.totalApplications || 0) * 0.55) },
+      { month: 'Sep', jobs: Math.floor((stats.totalJobs || 0) * 0.75), applications: Math.floor((stats.totalApplications || 0) * 0.7) },
+      { month: 'Oct', jobs: Math.floor((stats.totalJobs || 0) * 0.88), applications: Math.floor((stats.totalApplications || 0) * 0.85) },
+      { month: 'Nov', jobs: stats.totalJobs || 0, applications: stats.totalApplications || 0 },
+    ];
+
+    return {
+      userGrowthData,
+      applicationStatusData,
+      jobActivityData,
+      activityTrendData,
+    };
+  };
+
+  const analyticsData = generateAnalyticsData();
+
 
   
   const formatTimeAgo = (timestamp: string): string => {
@@ -355,14 +429,23 @@ const AdminDashboard: React.FC = () => {
                 <p className="text-gray-300 text-sm mt-1">Platform overview and management</p>
               </div>
             </div>
-            <button
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-lg font-medium hover:bg-gray-100 disabled:opacity-50 transition"
-            >
-              <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
-              Refresh
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate('/')}
+                className="flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-lg font-medium hover:bg-gray-100 transition"
+              >
+                <Home size={18} />
+                Home
+              </button>
+              <button
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-lg font-medium hover:bg-gray-100 disabled:opacity-50 transition"
+              >
+                <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
+                Refresh
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -428,6 +511,151 @@ const AdminDashboard: React.FC = () => {
             </p>
           </div>
         </div>
+
+        {/* Analytics Charts Section */}
+        {analyticsData && (
+          <>
+            {/* User Growth & Activity Trends */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {/* User Growth Chart */}
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <TrendingUp size={20} style={{ color: colors.royalBlue }} />
+                  <h3 className="text-lg font-bold text-gray-800">User Growth Trend</h3>
+                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={analyticsData.userGrowthData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="month" stroke="#6b7280" />
+                    <YAxis stroke="#6b7280" />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                    />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="employers" 
+                      stroke={colors.royalBlue} 
+                      strokeWidth={2}
+                      dot={{ fill: colors.royalBlue, r: 4 }}
+                      name="Employers"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="students" 
+                      stroke={colors.magenta} 
+                      strokeWidth={2}
+                      dot={{ fill: colors.magenta, r: 4 }}
+                      name="Students"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="total" 
+                      stroke={colors.purple} 
+                      strokeWidth={3}
+                      dot={{ fill: colors.purple, r: 5 }}
+                      name="Total Users"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Platform Activity Trend */}
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <BarChart3 size={20} style={{ color: colors.royalBlue }} />
+                  <h3 className="text-lg font-bold text-gray-800">Platform Activity</h3>
+                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={analyticsData.activityTrendData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="month" stroke="#6b7280" />
+                    <YAxis stroke="#6b7280" />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                    />
+                    <Legend />
+                    <Area 
+                      type="monotone" 
+                      dataKey="jobs" 
+                      stackId="1"
+                      stroke={colors.lightBlue} 
+                      fill={colors.lightBlue}
+                      fillOpacity={0.6}
+                      name="Jobs Posted"
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="applications" 
+                      stackId="1"
+                      stroke={colors.lightPink} 
+                      fill={colors.lightPink}
+                      fillOpacity={0.6}
+                      name="Applications"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Job Activity & Application Status */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {/* Job Activity Bar Chart */}
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <Briefcase size={20} style={{ color: colors.royalBlue }} />
+                  <h3 className="text-lg font-bold text-gray-800">Job Status Distribution</h3>
+                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={analyticsData.jobActivityData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="category" stroke="#6b7280" />
+                    <YAxis stroke="#6b7280" />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                    />
+                    <Legend />
+                    <Bar dataKey="count" name="Jobs" radius={[8, 8, 0, 0]}>
+                      {analyticsData.jobActivityData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Application Status Pie Chart */}
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <FileText size={20} style={{ color: colors.royalBlue }} />
+                  <h3 className="text-lg font-bold text-gray-800">Application Status Breakdown</h3>
+                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={analyticsData.applicationStatusData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name}: ${percent ? (percent * 100).toFixed(0) : 0}%`}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {analyticsData.applicationStatusData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                    />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Recent Employers & Students */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
