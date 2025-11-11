@@ -26,6 +26,7 @@ import JobDetailsView from './components/employer/JobDetailsView.tsx'
 
 // // Admin Components             
  import AdminDashboard from './components/admin/AdminDashboard.tsx'
+ import AdminLogin from './components/admin/AdminLogin.tsx'
 // import VerificationQueue from './components/admin/VerificationQueue.tsx'
 // import ContentModeration from './components/admin/ContentModeration.tsx'
 
@@ -105,7 +106,9 @@ const App: React.FC = () => {
           <Route path="/direct-contracts" element={<DirectContracts />} />
           <Route path="/find-freelance-jobs" element={<FindFreelanceJobs />} />
 
-           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
           {/* <Route path="/admin/verification" element={<VerificationQueue />} />
           <Route path="/admin/moderation" element={<ContentModeration />} />  */}
 
