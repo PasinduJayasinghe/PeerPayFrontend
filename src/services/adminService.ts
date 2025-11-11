@@ -3,18 +3,88 @@ import api from './api';
 
 // ============ TYPES ============
 export interface DashboardStats {
-  totalUsers: number;
-  userGrowth: number;
+  totalEmployers: number;
+  totalStudents: number;
+  totalJobs: number;
   activeJobs: number;
-  jobGrowth: number;
-  totalRevenue: number;
-  revenueGrowth: number;
-  activeDisputes: number;
-  disputeChange: number;
-  pendingVerifications: number;
-  flaggedContent: number;
+  totalApplications: number;
+  pendingApplications: number;
+  verifiedEmployers: number;
+  verifiedStudents: number;
+}
+
+export interface EmployerAccount {
+  employerId: string;
+  userId: string;
+  name: string;
+  email: string;
+  companyName: string;
+  companyType: string;
+  verificationStatus: string;
+  rating: number;
+  jobsPosted: number;
+  createdAt: string;
+  status: string;
+}
+
+export interface StudentAccount {
+  studentId: string;
+  userId: string;
+  name: string;
+  email: string;
+  university: string;
+  course: string;
+  yearOfStudy: number;
+  academicVerificationStatus: string;
+  rating: number;
   completedJobs: number;
-  newRegistrations: number;
+  totalEarnings: number;
+  createdAt: string;
+  status: string;
+}
+
+export interface JobDetails {
+  jobId: string;
+  title: string;
+  description: string;
+  employerId: string;
+  employerName: string;
+  categoryId: string;
+  categoryName: string;
+  payAmount: number;
+  payType: string;
+  location: string;
+  jobType: string;
+  status: string;
+  postedDate: string;
+  deadline: string;
+  requiredSkills: string[];
+  applicationCount: number;
+}
+
+export interface JobApplicationDetails {
+  id: string;
+  jobId: string;
+  jobTitle: string;
+  employerName: string;
+  studentId: string;
+  studentName: string;
+  studentEmail?: string;
+  university?: string;
+  course?: string;
+  appliedAt: string;
+  status: string;
+  coverLetter: string;
+  statusUpdatedAt: string;
+  employerNotes?: string;
+}
+
+export interface AdminDashboardData {
+  statistics: DashboardStats;
+  recentEmployers: EmployerAccount[];
+  recentStudents: StudentAccount[];
+  recentJobs: JobDetails[];
+  recentApplications: JobApplicationDetails[];
 }
 
 export interface RecentActivity {
@@ -134,19 +204,91 @@ export interface PlatformSettings {
 
 // ============ API SERVICE ============
 class AdminService {
-  private readonly BASE_URL = '/api/admin';
+  private readonly BASE_URL = '/admin';
 
   // ============ DASHBOARD ============
   /**
-   * GET /api/admin/dashboard/stats
-   * Fetch dashboard statistics
+   * GET /api/admin/dashboard
+   * Fetch complete dashboard data with statistics and recent items
+   */
+  async getDashboardData(recentItemsCount: number = 10): Promise<AdminDashboardData> {
+    try {
+      const response = await api.get<AdminDashboardData>(`${this.BASE_URL}/dashboard`, {
+        params: { recentItemsCount },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * GET /api/admin/dashboard/stats (backwards compatibility)
+   * Fetch dashboard statistics only
    */
   async getDashboardStats(): Promise<DashboardStats> {
     try {
-      const response = await api.get<DashboardStats>(`${this.BASE_URL}/dashboard/stats`);
-      return response.data;
+      const dashboardData = await this.getDashboardData(10);
+      return dashboardData.statistics;
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * GET /api/admin/employers
+   * Fetch all employer accounts
+   */
+  async getAllEmployers(): Promise<EmployerAccount[]> {
+    try {
+      const response = await api.get<EmployerAccount[]>(`${this.BASE_URL}/employers`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching employers:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * GET /api/admin/students
+   * Fetch all student accounts
+   */
+  async getAllStudents(): Promise<StudentAccount[]> {
+    try {
+      const response = await api.get<StudentAccount[]>(`${this.BASE_URL}/students`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * GET /api/admin/jobs
+   * Fetch all jobs
+   */
+  async getAllJobs(): Promise<JobDetails[]> {
+    try {
+      const response = await api.get<JobDetails[]>(`${this.BASE_URL}/jobs`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * GET /api/admin/applications
+   * Fetch all job applications
+   */
+  async getAllApplications(): Promise<JobApplicationDetails[]> {
+    try {
+      const response = await api.get<JobApplicationDetails[]>(`${this.BASE_URL}/applications`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching applications:', error);
       throw error;
     }
   }
