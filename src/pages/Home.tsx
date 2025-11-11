@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Search, TrendingUp, Shield, Clock, Star, ChevronRight, Users, Briefcase, Award, ArrowRight, Menu, X } from 'lucide-react';
+import { Search, TrendingUp, Shield, Clock, Star, ChevronRight, Briefcase, Award, ArrowRight, Menu, X } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
-import { jobService, jobCategoryService } from '../services';
+import { jobService } from '../services';
 import { toast } from 'sonner';
 import PeerPayLogo from '../assets/images/PeerPayLogo.png';
 import BannerImage from '../assets/images/BannerImage.jpeg';
@@ -10,7 +10,6 @@ import GeminiAIChatBot from '../components/chatbot/GeminiAIChatBot';
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [categories, setCategories] = useState<any[]>([]);
   const [featuredJobs, setFeaturedJobs] = useState<any[]>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearchMode, setIsSearchMode] = useState(false);
@@ -26,19 +25,12 @@ export default function Home() {
     try {
       setLoading(true);
       
-      // Fetch categories and latest jobs in parallel
-      const [categoriesData, jobsData] = await Promise.all([
-        jobCategoryService.getAllCategories().catch(err => {
-          console.error('Error fetching categories:', err);
-          return [];
-        }),
-        jobService.getActiveJobs().catch(err => {
-          console.error('Error fetching jobs:', err);
-          return [];
-        })
-      ]);
+      // Fetch latest jobs
+      const jobsData = await jobService.getActiveJobs().catch(err => {
+        console.error('Error fetching jobs:', err);
+        return [];
+      });
 
-      setCategories(categoriesData.slice(0, 8)); // Show max 8 categories
       // Get the 6 most recent jobs
       const sortedJobs = (jobsData || []).sort((a: any, b: any) => 
         new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime()
@@ -98,25 +90,12 @@ export default function Home() {
     }
   };
 
-  const getCategoryIcon = (name: string) => {
-    const iconMap: { [key: string]: string } = {
-      'Web Development': '�',
-      'Mobile App Development': '📱',
-      'Graphic Design': '🎨',
-      'Content Writing': '✍️',
-      'Digital Marketing': '�',
-      'Data Analysis': '📈',
-      'Video Editing': '🎬',
-      'Translation': '🌍',
-      'Photography': '📷',
-      'Tutoring': '�',
-      'Voice Over': '🎵'
-    };
-    return iconMap[name] || '💼';
-  };
-
-  const formatBudget = (amount: number) => {
-    return `Rs ${amount.toLocaleString()}`;
+  const formatBudget = (amount: number, payType?: string) => {
+    const formattedAmount = `Rs ${amount.toLocaleString()}`;
+    if (payType) {
+      return `${formattedAmount}/${payType}`;
+    }
+    return formattedAmount;
   };
 
   const formatDate = (dateString: string) => {
@@ -134,13 +113,6 @@ export default function Home() {
       return `${diffDays} days ago`;
     }
   };
-
-  const stats = [
-    { label: 'Active Jobs', value: '10,000+', icon: Briefcase },
-    { label: 'Freelancers', value: '50,000+', icon: Users },
-    { label: 'Projects Completed', value: '1M+', icon: Award },
-    { label: 'Avg. Response Time', value: '2 hours', icon: Clock },
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -399,96 +371,86 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">Browse by Category</h2>
-            <p className="text-slate-600 text-lg">Explore opportunities in your field of expertise</p>
-          </div>
-          {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, index) => (
-                <div key={index} className="bg-white rounded-2xl p-6 border border-slate-200 animate-pulse">
-                  <div className="w-12 h-12 bg-gray-200 rounded-full mb-4"></div>
-                  <div className="h-5 bg-gray-200 rounded mb-2 w-3/4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              ))}
-            </div>
-          ) : categories.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {categories.map((category, index) => (
-                <div
-                  key={category.categoryId || index}
-                  className="bg-white rounded-2xl p-6 border border-slate-200 hover:border-[#8C00FF] hover:shadow-xl transition-all cursor-pointer group"
-                  onClick={() => navigate(`/student/jobs?category=${category.categoryId}`)}
-                >
-                  <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">
-                    {getCategoryIcon(category.name)}
-                  </div>
-                  <h3 className="font-semibold text-slate-800 mb-2 group-hover:text-[#8C00FF] transition-colors">
-                    {category.name}
-                  </h3>
-                  <p className="text-slate-500 text-sm">{category.jobCount || 0} jobs available</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center text-slate-500 py-12">
-              <p>No categories available at the moment.</p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Popular Skills & Opportunities Section */}
+      {/* Available Jobs Section */}
       <section className="py-16 lg:py-24 xl:py-32 bg-slate-50">
         <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-slate-800 mb-2 lg:mb-4">Explore Opportunities</h2>
             <p className="text-slate-600 text-lg lg:text-xl xl:text-2xl">Find the perfect match for your skills or project needs</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 xl:gap-10">
-            {[
-              { title: 'Web Development', icon: '💻', color: 'from-blue-500 to-cyan-500', skills: ['React', 'Node.js', 'Python', 'PHP'], description: 'Build modern websites and applications' },
-              { title: 'Mobile Apps', icon: '📱', color: 'from-purple-500 to-pink-500', skills: ['React Native', 'Flutter', 'iOS', 'Android'], description: 'Create mobile experiences' },
-              { title: 'Design & Creative', icon: '🎨', color: 'from-orange-500 to-red-500', skills: ['UI/UX', 'Figma', 'Photoshop', 'Branding'], description: 'Bring ideas to visual life' },
-              { title: 'Content & Writing', icon: '✍️', color: 'from-green-500 to-teal-500', skills: ['Blog Writing', 'SEO', 'Copywriting', 'Social Media'], description: 'Engage audiences with words' },
-              { title: 'Digital Marketing', icon: '📊', color: 'from-yellow-500 to-orange-500', skills: ['SEO', 'Social Media', 'Analytics', 'Ads'], description: 'Grow your online presence' },
-              { title: 'Video & Animation', icon: '🎬', color: 'from-red-500 to-pink-500', skills: ['Video Editing', 'Motion Graphics', 'Animation'], description: 'Create engaging visual content' },
-              { title: 'Data & Analytics', icon: '📈', color: 'from-indigo-500 to-purple-500', skills: ['Excel', 'Data Entry', 'SQL', 'Reporting'], description: 'Transform data into insights' },
-              { title: 'Virtual Assistant', icon: '🤝', color: 'from-cyan-500 to-blue-500', skills: ['Admin', 'Support', 'Scheduling', 'Communication'], description: 'Provide professional support' },
-            ].map((category, index) => (
-              <div 
-                key={index} 
-                className="group bg-white rounded-2xl p-6 lg:p-8 xl:p-10 border border-slate-200 hover:shadow-2xl transition-all cursor-pointer hover:-translate-y-1"
-                onClick={() => navigate('/student/jobs')}
-              >
-                <div className={`w-16 h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 bg-gradient-to-br ${category.color} rounded-2xl flex items-center justify-center text-3xl lg:text-4xl xl:text-5xl mb-4 lg:mb-6 group-hover:scale-110 transition-transform`}>
-                  {category.icon}
-                </div>
-                <h3 className="font-bold text-slate-800 text-lg lg:text-xl xl:text-2xl mb-2 lg:mb-3">{category.title}</h3>
-                <p className="text-slate-600 text-sm lg:text-base xl:text-lg mb-4 lg:mb-6">{category.description}</p>
-                <div className="flex flex-wrap gap-2">
-                  {category.skills.slice(0, 3).map((skill, i) => (
-                    <span key={i} className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-medium group-hover:bg-purple-50 group-hover:text-[#8C00FF] transition-colors">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
+
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#8C00FF]"></div>
+            </div>
+          ) : featuredJobs.length > 0 ? (
+            <>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                {featuredJobs.map((job) => (
+                  <div 
+                    key={job.jobId} 
+                    className="group bg-white rounded-2xl p-6 lg:p-8 border border-slate-200 hover:shadow-2xl transition-all cursor-pointer hover:-translate-y-1"
+                    onClick={() => navigate(`/student/jobs/${job.jobId}`)}
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="font-bold text-slate-800 text-lg lg:text-xl xl:text-2xl line-clamp-2 flex-1">
+                        {job.title}
+                      </h3>
+                      <span className="bg-green-50 text-green-600 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ml-2">
+                        {formatDate(job.postedDate)}
+                      </span>
+                    </div>
+                    
+                    <p className="text-slate-600 text-sm lg:text-base mb-4 line-clamp-3">
+                      {job.description}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {(job.requiredSkills || []).slice(0, 3).map((skill: string, i: number) => (
+                        <span key={i} className="bg-purple-50 text-purple-700 px-3 py-1 rounded-lg text-xs font-medium group-hover:bg-[#8C00FF] group-hover:text-white transition-colors">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                      <div>
+                        <div className="text-slate-500 text-xs mb-1">Budget</div>
+                        <div className="font-bold text-[#8C00FF] text-lg">{formatBudget(job.payAmount, job.payType)}</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-500 text-xs mb-1">Duration</div>
+                        <div className="font-semibold text-slate-800">{job.durationDays} days</div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center text-slate-500 text-sm">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      {job.location}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div className="text-center mt-12 lg:mt-16">
-            <button 
-              onClick={() => navigate('/student/jobs')}
-              className="inline-flex items-center bg-[#8C00FF] text-white px-8 lg:px-12 xl:px-16 py-4 lg:py-5 xl:py-6 text-base lg:text-lg xl:text-xl rounded-full hover:bg-[#7000CC] transition-all font-medium shadow-lg hover:shadow-xl"
-            >
-              Browse All Categories
-              <ArrowRight className="ml-2 lg:ml-3" size={24} />
-            </button>
-          </div>
+              <div className="text-center mt-12 lg:mt-16">
+                <button 
+                  onClick={() => navigate('/find-freelance-jobs')}
+                  className="inline-flex items-center bg-[#8C00FF] text-white px-8 lg:px-12 xl:px-16 py-4 lg:py-5 xl:py-6 text-base lg:text-lg xl:text-xl rounded-full hover:bg-[#7000CC] transition-all font-medium shadow-lg hover:shadow-xl"
+                >
+                  View All Jobs
+                  <ArrowRight className="ml-2 lg:ml-3" size={24} />
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-20">
+              <Briefcase className="mx-auto h-16 w-16 text-slate-300 mb-4" />
+              <h3 className="text-xl font-semibold text-slate-600 mb-2">No jobs available yet</h3>
+              <p className="text-slate-500">Check back soon for new opportunities!</p>
+            </div>
+          )}
         </div>
       </section>
 
