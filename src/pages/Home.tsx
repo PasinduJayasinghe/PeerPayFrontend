@@ -5,11 +5,10 @@ import { jobService, jobCategoryService } from '../services';
 import { toast } from 'sonner';
 import PeerPayLogo from '../assets/images/PeerPayLogo.png';
 import BannerImage from '../assets/images/BannerImage.jpeg';
-import AIChatbot from '../components/chatbot/AIChatbot';
+import GeminiAIChatBot from '../components/chatbot/GeminiAIChatBot';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('hire');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [featuredJobs, setFeaturedJobs] = useState<any[]>([]);
@@ -154,9 +153,24 @@ export default function Home() {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-6">
-              <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors">Find Work</button>
-              <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors">Find Talent</button>
-              <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors">How it Works</button>
+              <button 
+                className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors"
+                onClick={() => navigate('/find-freelance-jobs')}
+              >
+                Find Work
+              </button>
+              <button 
+                className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors"
+                onClick={() => navigate('/talent-marketplace')}
+              >
+                Find Talent
+              </button>
+              <button 
+                className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors"
+                onClick={() => navigate('/how-to-find-work')}
+              >
+                How it Works
+              </button>
             </div>
             
             {/* Desktop Auth Buttons */}
@@ -184,13 +198,31 @@ export default function Home() {
           {isMobileMenuOpen && (
             <div className="md:hidden py-4 border-t border-slate-200">
               <div className="flex flex-col space-y-4">
-                <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors text-left px-4 py-2 hover:bg-gray-50 rounded-lg">
+                <button 
+                  className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors text-left px-4 py-2 hover:bg-gray-50 rounded-lg"
+                  onClick={() => {
+                    navigate('/find-freelance-jobs');
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
                   Find Work
                 </button>
-                <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors text-left px-4 py-2 hover:bg-gray-50 rounded-lg">
+                <button 
+                  className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors text-left px-4 py-2 hover:bg-gray-50 rounded-lg"
+                  onClick={() => {
+                    navigate('/talent-marketplace');
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
                   Find Talent
                 </button>
-                <button className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors text-left px-4 py-2 hover:bg-gray-50 rounded-lg">
+                <button 
+                  className="text-slate-700 hover:text-[#8C00FF] font-medium transition-colors text-left px-4 py-2 hover:bg-gray-50 rounded-lg"
+                  onClick={() => {
+                    navigate('/how-to-find-work');
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
                   How it Works
                 </button>
                 <div className="border-t border-slate-200 pt-4 px-4 space-y-3">
@@ -227,38 +259,46 @@ export default function Home() {
               Find the Perfect Freelancer or Your Next Job
             </h1>
             <p className="text-xl lg:text-2xl xl:text-3xl text-gray-100 mb-10 lg:mb-14">
-              Connect with talented professionals worldwide. Post jobs, hire talent, or find work that matches your skills.
+              Connect with talented professionals worldwide. Post jobs and find skilled students to work on your projects.
             </p>
 
-            {/* Tab Switcher */}
-            <div className="flex justify-center mb-8 lg:mb-12">
-              <div className="bg-white/10 backdrop-blur-sm rounded-full p-1 inline-flex">
-                <button
-                  onClick={() => setActiveTab('hire')}
-                  className={`px-8 lg:px-12 py-3 lg:py-4 rounded-full font-medium text-base lg:text-lg transition-all ${
-                    activeTab === 'hire' ? 'bg-white text-[#8C00FF] shadow-lg' : 'text-white hover:bg-white/20'
-                  }`}
-                >
-                  Hire Talent
-                </button>
-                <button
-                  onClick={() => setActiveTab('work')}
-                  className={`px-8 lg:px-12 py-3 lg:py-4 rounded-full font-medium text-base lg:text-lg transition-all ${
-                    activeTab === 'work' ? 'bg-white text-[#8C00FF] shadow-lg' : 'text-white hover:bg-white/20'
-                  }`}
-                >
-                  Find Work
-                </button>
+            {/* Employer Workflow Info */}
+            <div className="max-w-4xl mx-auto mb-12">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:p-8">
+                <h3 className="text-2xl lg:text-3xl font-bold text-white mb-6 text-center">How It Works</h3>
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="bg-white/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                      <span className="text-3xl font-bold text-white">1</span>
+                    </div>
+                    <h4 className="text-lg font-semibold text-white mb-2">Post a Job</h4>
+                    <p className="text-gray-200 text-sm">Employers create and post job opportunities with details and requirements</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="bg-white/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                      <span className="text-3xl font-bold text-white">2</span>
+                    </div>
+                    <h4 className="text-lg font-semibold text-white mb-2">Students Apply</h4>
+                    <p className="text-gray-200 text-sm">Talented students search for jobs and submit their applications</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="bg-white/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                      <span className="text-3xl font-bold text-white">3</span>
+                    </div>
+                    <h4 className="text-lg font-semibold text-white mb-2">Review & Hire</h4>
+                    <p className="text-gray-200 text-sm">Employers review applications and select the best candidate</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Search Bar */}
+            {/* Search Bar - Only for Finding Jobs */}
             <div className="max-w-3xl xl:max-w-4xl mx-auto">
               <div className="bg-white rounded-full shadow-2xl p-2 lg:p-3 flex items-center">
                 <Search className="ml-4 text-slate-400" size={28} />
                 <input
                   type="text"
-                  placeholder={activeTab === 'hire' ? 'Search for freelancers or skills...' : 'Search for jobs...'}
+                  placeholder="Search for jobs..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleSearchKeyPress}
@@ -680,10 +720,16 @@ export default function Home() {
             Join thousands of professionals who trust PeerPay for their freelance needs
           </p>
           <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center">
-            <button className="bg-white text-[#8C00FF] px-8 lg:px-12 xl:px-16 py-4 lg:py-5 xl:py-6 rounded-full hover:bg-gray-50 transition-all font-semibold text-lg lg:text-xl xl:text-2xl shadow-xl">
+            <button 
+              onClick={() => navigate('/login')}
+              className="bg-white text-[#8C00FF] px-8 lg:px-12 xl:px-16 py-4 lg:py-5 xl:py-6 rounded-full hover:bg-gray-50 transition-all font-semibold text-lg lg:text-xl xl:text-2xl shadow-xl"
+            >
               Post a Job
             </button>
-            <button className="bg-transparent border-2 border-white text-white px-8 lg:px-12 xl:px-16 py-4 lg:py-5 xl:py-6 rounded-full hover:bg-white hover:text-[#8C00FF] transition-all font-semibold text-lg lg:text-xl xl:text-2xl">
+            <button 
+              onClick={() => navigate('/find-freelance-jobs')}
+              className="bg-transparent border-2 border-white text-white px-8 lg:px-12 xl:px-16 py-4 lg:py-5 xl:py-6 rounded-full hover:bg-white hover:text-[#8C00FF] transition-all font-semibold text-lg lg:text-xl xl:text-2xl"
+            >
               Find Work
             </button>
           </div>
@@ -734,7 +780,7 @@ export default function Home() {
       </footer>
 
       {/* AI Chatbot */}
-      <AIChatbot />
+      <GeminiAIChatBot />
     </div>
   );
 }

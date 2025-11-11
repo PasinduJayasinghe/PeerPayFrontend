@@ -19,48 +19,6 @@ import PeerPayLogo from '../assets/images/PeerPayLogo.png';
 const TalentMarketplace: React.FC = () => {
   const navigate = useNavigate();
 
-  const categories = [
-    { name: 'Web Development', icon: Code, count: 245, color: 'blue' },
-    { name: 'Graphic Design', icon: Palette, count: 189, color: 'pink' },
-    { name: 'Content Writing', icon: BookOpen, count: 312, color: 'green' },
-    { name: 'Video Editing', icon: Video, count: 156, color: 'purple' },
-  ];
-
-  const topTalent = [
-    {
-      name: 'Kasun Perera',
-      university: 'University of Moratuwa',
-      skills: ['React', 'Node.js', 'TypeScript'],
-      rating: 4.9,
-      completedJobs: 47,
-      hourlyRate: 1500
-    },
-    {
-      name: 'Nimali Silva',
-      university: 'University of Colombo',
-      skills: ['UI/UX Design', 'Figma', 'Adobe XD'],
-      rating: 4.8,
-      completedJobs: 38,
-      hourlyRate: 1200
-    },
-    {
-      name: 'Ravindu Fernando',
-      university: 'SLIIT',
-      skills: ['Python', 'Data Analysis', 'Machine Learning'],
-      rating: 4.9,
-      completedJobs: 52,
-      hourlyRate: 1800
-    },
-    {
-      name: 'Thisara Jayasinghe',
-      university: 'University of Peradeniya',
-      skills: ['Content Writing', 'SEO', 'Copywriting'],
-      rating: 4.7,
-      completedJobs: 65,
-      hourlyRate: 1000
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
       {/* Header */}
@@ -87,177 +45,125 @@ const TalentMarketplace: React.FC = () => {
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-[#8C00FF] rounded-full mb-6">
             <Users className="w-5 h-5" />
-            <span className="font-semibold">Talent Marketplace</span>
+            <span className="font-semibold">Employer Hub</span>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            Find the
-            <span className="text-[#8C00FF]"> Perfect Student</span>
-            <br />for Your Project
+            Post Jobs &
+            <span className="text-[#8C00FF]"> Hire Students</span>
+            <br />for Your Projects
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            Browse thousands of verified, talented university students ready to work on your projects
+            Post your job requirements and review applications from talented university students
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => navigate('/register/employer')}
+              onClick={() => navigate('/login')}
               className="px-8 py-4 bg-[#8C00FF] text-white rounded-lg font-semibold hover:bg-[#7300CC] transition text-lg"
             >
-              Start Hiring
+              Post a Job
             </button>
             <button
-              onClick={() => navigate('/student/jobs')}
+              onClick={() => navigate('/how-to-hire')}
               className="px-8 py-4 bg-white text-[#8C00FF] border-2 border-[#8C00FF] rounded-lg font-semibold hover:bg-purple-50 transition text-lg"
             >
-              Browse Talent
+              Learn How It Works
             </button>
           </div>
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-blue-600" />
-              </div>
-              <div className="text-4xl font-bold text-gray-900 mb-2">1,500+</div>
-              <div className="text-gray-600">Verified Students</div>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Briefcase className="w-8 h-8 text-green-600" />
-              </div>
-              <div className="text-4xl font-bold text-gray-900 mb-2">3,200+</div>
-              <div className="text-gray-600">Jobs Completed</div>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Star className="w-8 h-8 text-[#8C00FF]" />
-              </div>
-              <div className="text-4xl font-bold text-gray-900 mb-2">4.8/5</div>
-              <div className="text-gray-600">Average Rating</div>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="w-8 h-8 text-orange-600" />
-              </div>
-              <div className="text-4xl font-bold text-gray-900 mb-2">98%</div>
-              <div className="text-gray-600">Success Rate</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Categories */}
-      <section className="py-16 px-4 bg-gray-50">
+      {/* How It Works */}
+      <section className="py-16 px-4 bg-white border-y border-gray-200">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Browse by Category</h2>
-            <p className="text-xl text-gray-600">Find students with the skills you need</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
+            <p className="text-xl text-gray-600">Simple steps to find the perfect student for your project</p>
           </div>
-          <div className="grid md:grid-cols-4 gap-6">
-            {categories.map((category) => {
-              const Icon = category.icon;
-              const colorClasses = {
-                blue: 'from-blue-500 to-cyan-500',
-                pink: 'from-pink-500 to-rose-500',
-                green: 'from-green-500 to-emerald-500',
-                purple: 'from-purple-500 to-pink-500'
-              };
-              return (
-                <div 
-                  key={category.name}
-                  className="bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition cursor-pointer group"
-                  onClick={() => navigate('/student/jobs')}
-                >
-                  <div className={`w-16 h-16 bg-gradient-to-br ${colorClasses[category.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition`}>
-                    <Icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{category.name}</h3>
-                  <p className="text-gray-600">{category.count} students available</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Top Talent */}
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Top Rated Students</h2>
-            <p className="text-xl text-gray-600">Hire proven performers with excellent track records</p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {topTalent.map((student, index) => (
-              <div key={index} className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-[#8C00FF] hover:shadow-lg transition">
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
-                    {student.name.charAt(0)}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">{student.name}</h3>
-                    <p className="text-sm text-gray-600 mb-3">{student.university}</p>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {student.skills.map((skill) => (
-                        <span key={skill} className="px-3 py-1 bg-purple-100 text-[#8C00FF] rounded-full text-sm font-medium">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm">
-                        <div className="flex items-center gap-1">
-                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          <span className="font-semibold">{student.rating}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Briefcase className="w-4 h-4 text-gray-600" />
-                          <span>{student.completedJobs} jobs</span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-bold text-[#8C00FF]">Rs {student.hourlyRate}/hr</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-4xl font-bold text-white">1</span>
               </div>
-            ))}
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Post Your Job</h3>
+              <p className="text-gray-600">Create a detailed job posting with your requirements, budget, and timeline</p>
+            </div>
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-4xl font-bold text-white">2</span>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Receive Applications</h3>
+              <p className="text-gray-600">Students search for jobs and submit applications with their profiles and proposals</p>
+            </div>
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-4xl font-bold text-white">3</span>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Review & Hire</h3>
+              <p className="text-gray-600">Review applications, compare candidates, and select the best student for your project</p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Features */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Hire Through PeerPay</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center p-6 bg-white border-2 border-gray-200 rounded-xl hover:border-[#8C00FF] transition">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2 text-gray-900">Verified Students</h3>
+              <p className="text-gray-600">All students are verified with university credentials for quality assurance</p>
+            </div>
+            <div className="text-center p-6 bg-white border-2 border-gray-200 rounded-xl hover:border-[#8C00FF] transition">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Briefcase className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2 text-gray-900">Easy Application Review</h3>
+              <p className="text-gray-600">Review all applications in one place and compare candidates easily</p>
+            </div>
+            <div className="text-center p-6 bg-white border-2 border-gray-200 rounded-xl hover:border-[#8C00FF] transition">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2 text-gray-900">Quality Guaranteed</h3>
+              <p className="text-gray-600">Our rating system and reviews ensure consistent high quality work</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Job Categories */}
       <section className="py-16 px-4 bg-gradient-to-br from-purple-500 to-pink-500 text-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Why Choose PeerPay Talent</h2>
+            <h2 className="text-4xl font-bold mb-4">Popular Job Categories</h2>
+            <p className="text-xl text-purple-100">Students with diverse skills are ready for your projects</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Verified Students</h3>
-              <p className="text-purple-100">All students are verified with university credentials</p>
+          <div className="grid md:grid-cols-4 gap-6">
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl text-center hover:bg-white/20 transition">
+              <Code className="w-12 h-12 mx-auto mb-3" />
+              <h3 className="text-lg font-bold mb-2">Web Development</h3>
+              <p className="text-sm text-purple-100">React, Node.js, Full Stack</p>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
-                <Filter className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Advanced Filtering</h3>
-              <p className="text-purple-100">Find exactly who you need with smart search tools</p>
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl text-center hover:bg-white/20 transition">
+              <Palette className="w-12 h-12 mx-auto mb-3" />
+              <h3 className="text-lg font-bold mb-2">Graphic Design</h3>
+              <p className="text-sm text-purple-100">UI/UX, Branding, Illustration</p>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Quality Guaranteed</h3>
-              <p className="text-purple-100">Our rating system ensures consistent high quality</p>
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl text-center hover:bg-white/20 transition">
+              <BookOpen className="w-12 h-12 mx-auto mb-3" />
+              <h3 className="text-lg font-bold mb-2">Content Writing</h3>
+              <p className="text-sm text-purple-100">SEO, Copywriting, Blogging</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl text-center hover:bg-white/20 transition">
+              <Video className="w-12 h-12 mx-auto mb-3" />
+              <h3 className="text-lg font-bold mb-2">Video Editing</h3>
+              <p className="text-sm text-purple-100">Adobe Premiere, After Effects</p>
             </div>
           </div>
         </div>
@@ -266,15 +172,15 @@ const TalentMarketplace: React.FC = () => {
       {/* CTA */}
       <section className="py-20 px-4 bg-white">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">Ready to Hire Top Student Talent?</h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">Ready to Hire Talented Students?</h2>
           <p className="text-xl text-gray-600 mb-8">
-            Post your first job for free and connect with skilled students today
+            Post your job and start receiving applications from qualified students today
           </p>
           <button
-            onClick={() => navigate('/register/employer')}
+            onClick={() => navigate('/login')}
             className="px-8 py-4 bg-[#8C00FF] text-white rounded-lg font-semibold hover:bg-[#7300CC] transition text-lg"
           >
-            Get Started Now
+            Post Your First Job
           </button>
         </div>
       </section>

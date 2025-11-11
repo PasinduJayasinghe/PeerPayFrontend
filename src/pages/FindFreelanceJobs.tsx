@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Briefcase, 
@@ -17,62 +17,118 @@ import {
   Zap
 } from 'lucide-react';
 import PeerPayLogo from '../assets/images/PeerPayLogo.png';
+import { jobService, jobCategoryService } from '../services';
+import { toast } from 'sonner';
 
 const FindFreelanceJobs: React.FC = () => {
   const navigate = useNavigate();
+  const [categories, setCategories] = useState<any[]>([]);
+  const [featuredJobs, setFeaturedJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const jobCategories = [
-    { name: 'Web Development', icon: Code, count: 245, color: 'blue' },
-    { name: 'Graphic Design', icon: Palette, count: 189, color: 'pink' },
-    { name: 'Content Writing', icon: BookOpen, count: 312, color: 'green' },
-    { name: 'Digital Marketing', icon: TrendingUp, count: 156, color: 'purple' },
-  ];
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      
+      const [categoriesData, jobsData] = await Promise.all([
+        jobCategoryService.getAllCategories().catch(err => {
+          console.error('Categories error:', err);
+          return [];
+        }),
+        jobService.getActiveJobs().catch(err => {
+          console.error('Jobs error:', err);
+          return [];
+        })
+      ]);
+
+      console.log('Categories:', categoriesData);
+      console.log('Jobs:', jobsData);
+
+      setCategories(categoriesData.slice(0, 4)); // Show 4 categories
+      
+      // Get latest 6 jobs
+      const sortedJobs = (jobsData || [])
+        .filter((job: any) => job && job.jobId) // Filter out invalid jobs
+        .sort((a: any, b: any) => {
+          const dateA = a.postedDate ? new Date(a.postedDate).getTime() : 0;
+          const dateB = b.postedDate ? new Date(b.postedDate).getTime() : 0;
+          return dateB - dateA;
+        })
+        .slice(0, 6);
+      
+      setFeaturedJobs(sortedJobs);
+      console.log('Featured jobs set:', sortedJobs);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast.error('Failed to load jobs');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getCategoryIcon = (name: string) => {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes('web') || lowerName.includes('development')) return Code;
+    if (lowerName.includes('design') || lowerName.includes('graphic')) return Palette;
+    if (lowerName.includes('content') || lowerName.includes('writing')) return BookOpen;
+    if (lowerName.includes('marketing')) return TrendingUp;
+    return Briefcase;
+  };
+
+  const getCategoryColor = (index: number) => {
+    const colors = ['blue', 'pink', 'green', 'purple'];
+    return colors[index % colors.length];
+  };
+
+  const formatBudget = (amount?: number, payType?: string) => {
+    if (!amount) return 'Budget not specified';
+    const formattedAmount = `Rs ${amount.toLocaleString()}`;
+    
+    if (!payType || payType === 'Fixed') {
+      return formattedAmount;
+    }
+    
+    return `${formattedAmount}/${payType.toLowerCase()}`;
+  };
+
+  const formatTimeAgo = (date?: string) => {
+    if (!date) return 'Recently';
+    
+    try {
+      const now = new Date();
+      const posted = new Date(date);
+      const diffMs = now.getTime() - posted.getTime();
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffDays = Math.floor(diffHours / 24);
+      
+      if (diffHours < 1) return 'Just now';
+      if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+      if (diffDays === 1) return 'Yesterday';
+      return `${diffDays} days ago`;
+    } catch {
+      return 'Recently';
+    }
+  };
 
   const tips = [
     {
       icon: Star,
       title: 'Complete Your Profile',
-      description: 'Students with complete profiles get 3x more job invitations'
+      description: 'Students with complete profiles get more job invitations'
     },
     {
       icon: Zap,
       title: 'Apply Early',
-      description: 'First 5 applicants have 60% higher chance of getting hired'
+      description: 'First applicants have higher chance of getting hired'
     },
     {
       icon: CheckCircle,
       title: 'Custom Proposals',
-      description: 'Personalized applications get 80% more responses'
-    }
-  ];
-
-  const featuredJobs = [
-    {
-      title: 'React Developer Needed',
-      company: 'Tech Startup',
-      budget: '25,000 - 35,000',
-      duration: '1-2 months',
-      location: 'Remote',
-      skills: ['React', 'TypeScript', 'Node.js'],
-      postedTime: '2 hours ago'
-    },
-    {
-      title: 'Logo Design for Cafe',
-      company: 'Local Business',
-      budget: '8,000 - 12,000',
-      duration: '1 week',
-      location: 'Colombo',
-      skills: ['Adobe Illustrator', 'Branding'],
-      postedTime: '5 hours ago'
-    },
-    {
-      title: 'SEO Content Writer',
-      company: 'Digital Agency',
-      budget: '15,000 - 20,000',
-      duration: '2-3 weeks',
-      location: 'Remote',
-      skills: ['SEO', 'Content Writing', 'Research'],
-      postedTime: '1 day ago'
+      description: 'Personalized applications get more responses'
     }
   ];
 
@@ -149,30 +205,6 @@ const FindFreelanceJobs: React.FC = () => {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="py-16 px-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-5xl font-bold mb-2">900+</div>
-              <div className="text-cyan-100">Active Jobs</div>
-            </div>
-            <div>
-              <div className="text-5xl font-bold mb-2">Rs 2.5M+</div>
-              <div className="text-cyan-100">Paid Monthly</div>
-            </div>
-            <div>
-              <div className="text-5xl font-bold mb-2">1,500+</div>
-              <div className="text-cyan-100">Students Earning</div>
-            </div>
-            <div>
-              <div className="text-5xl font-bold mb-2">4.8/5</div>
-              <div className="text-cyan-100">Average Rating</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Categories */}
       <section className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
@@ -180,30 +212,43 @@ const FindFreelanceJobs: React.FC = () => {
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Popular Categories</h2>
             <p className="text-xl text-gray-600">Find jobs that match your skills</p>
           </div>
-          <div className="grid md:grid-cols-4 gap-6">
-            {jobCategories.map((category) => {
-              const Icon = category.icon;
-              const colorClasses = {
-                blue: 'from-blue-500 to-cyan-500',
-                pink: 'from-pink-500 to-rose-500',
-                green: 'from-green-500 to-emerald-500',
-                purple: 'from-purple-500 to-pink-500'
-              };
-              return (
-                <div 
-                  key={category.name}
-                  className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:border-[#8C00FF] hover:shadow-lg transition cursor-pointer group"
-                  onClick={() => navigate('/student/jobs')}
-                >
-                  <div className={`w-16 h-16 bg-gradient-to-br ${colorClasses[category.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition`}>
-                    <Icon className="w-8 h-8 text-white" />
+          
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8C00FF] mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading categories...</p>
+            </div>
+          ) : categories.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              No categories available
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-4 gap-6">
+              {categories.map((category, index) => {
+                const Icon = getCategoryIcon(category.name);
+                const color = getCategoryColor(index);
+                const colorClasses = {
+                  blue: 'from-blue-500 to-cyan-500',
+                  pink: 'from-pink-500 to-rose-500',
+                  green: 'from-green-500 to-emerald-500',
+                  purple: 'from-purple-500 to-pink-500'
+                };
+                return (
+                  <div 
+                    key={category.categoryId}
+                    className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:border-[#8C00FF] hover:shadow-lg transition cursor-pointer group"
+                    onClick={() => navigate('/student/jobs')}
+                  >
+                    <div className={`w-16 h-16 bg-gradient-to-br ${colorClasses[color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition`}>
+                      <Icon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">{category.name}</h3>
+                    <p className="text-gray-600 text-sm">{category.description || 'Explore opportunities'}</p>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{category.name}</h3>
-                  <p className="text-gray-600">{category.count} jobs available</p>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
@@ -211,53 +256,91 @@ const FindFreelanceJobs: React.FC = () => {
       <section className="py-16 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Featured Jobs</h2>
-            <p className="text-xl text-gray-600">Start applying to these hot opportunities</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Latest Jobs</h2>
+            <p className="text-xl text-gray-600">Start applying to these opportunities</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {featuredJobs.map((job, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition border border-gray-200 cursor-pointer">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-gray-900">{job.title}</h3>
-                  <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">New</span>
-                </div>
-                <p className="text-gray-600 mb-4">{job.company}</p>
-                
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <DollarSign className="w-4 h-4" />
-                    <span className="text-sm">Rs {job.budget}</span>
+          
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8C00FF] mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading jobs...</p>
+            </div>
+          ) : featuredJobs.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <Briefcase className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+              <p>No jobs available at the moment</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-6">
+              {featuredJobs.map((job) => (
+                <div 
+                  key={job.jobId} 
+                  className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition border border-gray-200 cursor-pointer"
+                  onClick={() => navigate(`/student/jobs/${job.jobId}`)}
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold text-gray-900 line-clamp-2">{job.title}</h3>
+                    <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full flex-shrink-0 ml-2">New</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Clock className="w-4 h-4" />
-                    <span className="text-sm">{job.duration}</span>
+                  <p className="text-gray-600 mb-4">{job.employerName || job.companyName || 'Company'}</p>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <DollarSign className="w-4 h-4 flex-shrink-0" />
+                      <span className="text-sm">{formatBudget(job.payAmount, job.payType)}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Clock className="w-4 h-4 flex-shrink-0" />
+                      <span className="text-sm capitalize">{job.jobType?.replace(/([A-Z])/g, ' $1').trim() || 'Full Time'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <MapPin className="w-4 h-4 flex-shrink-0" />
+                      <span className="text-sm">{job.location || 'Remote'}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <MapPin className="w-4 h-4" />
-                    <span className="text-sm">{job.location}</span>
-                  </div>
-                </div>
 
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {job.skills.map((skill) => (
-                    <span key={skill} className="px-2 py-1 bg-purple-50 text-[#8C00FF] rounded text-xs">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
+                  {job.requiredSkills && job.requiredSkills.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {job.requiredSkills.slice(0, 3).map((skill: string, idx: number) => (
+                        <span key={idx} className="px-2 py-1 bg-purple-50 text-[#8C00FF] rounded text-xs">
+                          {skill}
+                        </span>
+                      ))}
+                      {job.requiredSkills.length > 3 && (
+                        <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
+                          +{job.requiredSkills.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  )}
 
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                  <span className="text-xs text-gray-500">{job.postedTime}</span>
-                  <button 
-                    onClick={() => navigate('/student/jobs')}
-                    className="px-4 py-2 bg-[#8C00FF] text-white rounded-lg font-semibold hover:bg-[#7300CC] transition text-sm"
-                  >
-                    Apply Now
-                  </button>
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                    <span className="text-xs text-gray-500">{formatTimeAgo(job.postedDate)}</span>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/student/jobs/${job.jobId}`);
+                      }}
+                      className="px-4 py-2 bg-[#8C00FF] text-white rounded-lg font-semibold hover:bg-[#7300CC] transition text-sm"
+                    >
+                      View Details
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
+
+          {featuredJobs.length > 0 && (
+            <div className="text-center mt-10">
+              <button
+                onClick={() => navigate('/student/jobs')}
+                className="px-8 py-3 bg-[#8C00FF] text-white rounded-lg font-semibold hover:bg-[#7300CC] transition"
+              >
+                View All Jobs
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -289,7 +372,7 @@ const FindFreelanceJobs: React.FC = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Start Your Freelance Journey?</h2>
           <p className="text-xl text-cyan-100 mb-8">
-            Join 1,500+ students already earning on PeerPay
+            Join students already earning on PeerPay
           </p>
           <button
             onClick={() => navigate('/register/student')}

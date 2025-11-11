@@ -8,11 +8,9 @@ import {
   Calendar,
   Clock,
   Users,
-  Building,
   CheckCircle,
   AlertCircle,
   FileText,
-  Upload,
   X,
   Bookmark,
   BookmarkPlus,
@@ -35,7 +33,6 @@ const JobDetails: React.FC = () => {
   const [hasApplied, setHasApplied] = useState(false);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
-  const [attachments, setAttachments] = useState<File[]>([]);
   const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
@@ -130,15 +127,13 @@ const JobDetails: React.FC = () => {
       await jobService.applyForJob({
         jobId: id,
         studentId: user.userId,
-        coverLetter: coverLetter.trim(),
-        attachments: attachments.length > 0 ? attachments.map(f => f.name) : undefined
+        coverLetter: coverLetter.trim()
       });
 
       toast.success('Application submitted successfully!');
       setHasApplied(true);
       setShowApplicationModal(false);
       setCoverLetter('');
-      setAttachments([]);
     } catch (error: any) {
       console.error('Failed to submit application:', error);
       toast.error(error.response?.data?.message || 'Failed to submit application');
@@ -498,65 +493,6 @@ const JobDetails: React.FC = () => {
                 <p className="text-sm text-gray-500 mt-2">
                   {coverLetter.length} characters
                 </p>
-              </div>
-
-              {/* Attachments */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Attachments (Optional)
-                </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-sm text-gray-600 mb-2">
-                    Upload your resume, portfolio, or other relevant documents
-                  </p>
-                  <p className="text-xs text-gray-500 mb-4">
-                    Maximum file size: 10MB
-                  </p>
-                  <input
-                    type="file"
-                    accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
-                    multiple
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files.length > 0) {
-                        const newFiles = Array.from(e.target.files);
-                        setAttachments([...attachments, ...newFiles]);
-                      }
-                    }}
-                    className="hidden"
-                    id="file-upload"
-                    disabled={applying}
-                  />
-                  <label
-                    htmlFor="file-upload"
-                    className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer transition"
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Choose Files
-                  </label>
-                </div>
-                {attachments.length > 0 && (
-                  <div className="mt-3 space-y-2">
-                    {attachments.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-700 truncate">{file.name}</p>
-                            <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(2)} KB</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setAttachments(attachments.filter((_, i) => i !== index))}
-                          className="ml-2 p-1 hover:bg-gray-200 rounded transition flex-shrink-0"
-                          disabled={applying}
-                        >
-                          <X className="w-4 h-4 text-gray-600" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
 
               {/* Action Buttons */}
