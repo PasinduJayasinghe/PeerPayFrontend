@@ -43,8 +43,9 @@ interface CreateJobApplicationDto {
 
 interface UpdateApplicationStatusDto {
   applicationId: string;
-  status: ApplicationStatus;
-  feedback?: string;
+  status: string; // "Accepted", "Rejected", "Pending", etc.
+  updatedBy: string; // Employer/User ID
+  employerNotes?: string;
 }
 
 interface JobSearchCriteria {

@@ -4,14 +4,9 @@ import {
   ArrowLeft,
   Star,
   Briefcase,
-  Clock,
-  DollarSign,
-  MapPin,
-  User,
   MessageCircle,
   CheckCircle,
   XCircle,
-  Eye,
   Mail,
   Award,
   Calendar
@@ -37,7 +32,7 @@ const ManageApplications: React.FC = () => {
   const [applications, setApplications] = useState<ApplicationWithStudent[]>([]);
   const [selectedApp, setSelectedApp] = useState<ApplicationWithStudent | null>(null);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'Pending' | 'Accepted' | 'Rejected'>('all');
+  const [filter, setFilter] = useState<'all' | 'Submitted' | 'Selected' | 'Rejected'>('all');
   const [jobTitle, setJobTitle] = useState('');
 
   useEffect(() => {
@@ -71,7 +66,7 @@ const ManageApplications: React.FC = () => {
 
     try {
       setLoading(true);
-      const apps = await jobService.getJobApplications(jobId);
+      const apps = await jobService.getApplicationsByJob(jobId);
       
       // Fetch student details for each application
       const appsWithStudents = await Promise.all(
@@ -110,12 +105,18 @@ const ManageApplications: React.FC = () => {
     }
   };
 
-  const handleUpdateStatus = async (applicationId: string, status: 'Accepted' | 'Rejected') => {
+  const handleUpdateStatus = async (applicationId: string, status: 'Selected' | 'Rejected') => {
+    if (!user?.userId) {
+      toast.error('User not authenticated');
+      return;
+    }
+
     try {
       await jobService.updateApplicationStatus({
         applicationId,
         status,
-        feedback: status === 'Accepted' ? 'Congratulations! You have been selected.' : 'Thank you for applying.'
+        updatedBy: user.userId,
+        employerNotes: status === 'Selected' ? 'Congratulations! You have been selected.' : 'Thank you for applying.'
       });
 
       toast.success(`Application ${status.toLowerCase()} successfully`);
@@ -130,7 +131,7 @@ const ManageApplications: React.FC = () => {
 
   const handleAccept = () => {
     if (!selectedApp) return;
-    handleUpdateStatus(selectedApp.applicationId, 'Accepted');
+    handleUpdateStatus(selectedApp.applicationId, 'Selected');
   };
 
   const handleReject = () => {
@@ -288,7 +289,7 @@ const ManageApplications: React.FC = () => {
                         {app.coverLetter}
                       </p>
                       <p className="text-xs text-gray-400 mt-2">
-                        Applied {new Date(app.appliedAt).toLocaleDateString()}
+                        Applied {new Date(app.appliedDate).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
@@ -349,7 +350,7 @@ const ManageApplications: React.FC = () => {
                         <span className="text-sm font-medium">Applied</span>
                       </div>
                       <p className="text-sm font-bold text-green-900">
-                        {new Date(selectedApp.appliedAt).toLocaleDateString()}
+                        {new Date(selectedApp.appliedDate).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
@@ -387,7 +388,7 @@ const ManageApplications: React.FC = () => {
 
                   {/* Action Buttons */}
                   <div className="flex gap-3 pt-6 border-t">
-                    {selectedApp.status === 'Pending' && (
+                    {(selectedApp.status === 'Submitted' || selectedApp.status === 'UnderReview') && (
                       <>
                         <button
                           onClick={handleAccept}
