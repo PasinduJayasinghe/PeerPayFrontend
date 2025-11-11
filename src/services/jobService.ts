@@ -146,6 +146,25 @@ class JobService {
   }
 
   /**
+   * GET /api/job/search?q={searchTerm}
+   * Search jobs by keyword (title, description, skills, category)
+   */
+  async searchJobsByKeyword(searchTerm: string = '', page: number = 1, pageSize: number = 20): Promise<Job[]> {
+    try {
+      const params = new URLSearchParams();
+      if (searchTerm) params.append('q', searchTerm);
+      params.append('page', page.toString());
+      params.append('pageSize', pageSize.toString());
+      
+      const response = await api.get<Job[]>(`${this.BASE_URL}/search?${params.toString()}`);
+      return response.data;
+    } catch (error) {
+      console.error('Search jobs by keyword error:', error);
+      throw error;
+    }
+  }
+
+  /**
    * GET /api/job/employer/{employerId}
    * Get all jobs posted by an employer
    */

@@ -13,7 +13,10 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [featuredJobs, setFeaturedJobs] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearchMode, setIsSearchMode] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,25 +27,75 @@ export default function Home() {
     try {
       setLoading(true);
       
-      // Fetch categories and jobs in parallel
+      // Fetch categories and latest jobs in parallel
       const [categoriesData, jobsData] = await Promise.all([
         jobCategoryService.getAllCategories().catch(err => {
           console.error('Error fetching categories:', err);
           return [];
         }),
-        jobService.getAllJobs(1, 6).catch(err => {
+        jobService.getActiveJobs().catch(err => {
           console.error('Error fetching jobs:', err);
-          return { items: [], totalCount: 0, page: 1, pageSize: 6, totalPages: 0 };
+          return [];
         })
       ]);
 
       setCategories(categoriesData.slice(0, 8)); // Show max 8 categories
-      setFeaturedJobs(jobsData.items || []);
+      // Get the 6 most recent jobs
+      const sortedJobs = (jobsData || []).sort((a: any, b: any) => 
+        new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime()
+      ).slice(0, 6);
+      setFeaturedJobs(sortedJobs);
     } catch (error: any) {
       console.error('Error loading data:', error);
-      toast.error('Failed to load some data. Using cached data.');
+      toast.error('Failed to load some data.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      toast.error('Please enter a search term');
+      return;
+    }
+
+    try {
+      setSearching(true);
+      const results = await jobService.searchJobsByKeyword(searchQuery, 1, 50);
+      
+      if (results.length === 0) {
+        toast.info('No jobs found matching your search');
+        setSearchResults([]);
+        setIsSearchMode(true);
+        return;
+      }
+
+      // Display results on the same page
+      setSearchResults(results);
+      setIsSearchMode(true);
+      toast.success(`Found ${results.length} jobs matching "${searchQuery}"`);
+      
+      // Scroll to results section
+      setTimeout(() => {
+        document.getElementById('search-results')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } catch (error) {
+      console.error('Search error:', error);
+      toast.error('Failed to search jobs');
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSearchResults([]);
+    setIsSearchMode(false);
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
     }
   };
 
@@ -208,16 +261,47 @@ export default function Home() {
                   placeholder={activeTab === 'hire' ? 'Search for freelancers or skills...' : 'Search for jobs...'}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
                   className="flex-1 px-4 lg:px-6 py-3 lg:py-4 text-slate-800 outline-none text-lg lg:text-xl"
                 />
-                <button className="bg-[#8C00FF] text-white px-8 lg:px-12 py-3 lg:py-4 rounded-full hover:bg-[#7000CC] transition-all font-medium text-base lg:text-lg shadow-lg">
-                  Search
+                <button 
+                  onClick={handleSearch}
+                  disabled={searching}
+                  className="bg-[#8C00FF] text-white px-8 lg:px-12 py-3 lg:py-4 rounded-full hover:bg-[#7000CC] transition-all font-medium text-base lg:text-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {searching ? 'Searching...' : 'Search'}
                 </button>
               </div>
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 <span className="text-gray-100 text-sm">Popular:</span>
                 {['Web Development', 'Logo Design', 'Content Writing', 'Mobile Apps'].map((tag) => (
-                  <button key={tag} className="bg-white/20 hover:bg-white/30 px-4 py-1 rounded-full text-sm transition-all">
+                  <button 
+                    key={tag} 
+                    onClick={async () => {
+                      setSearchQuery(tag);
+                      // Trigger search with the tag
+                      try {
+                        setSearching(true);
+                        const results = await jobService.searchJobsByKeyword(tag, 1, 50);
+                        if (results.length === 0) {
+                          toast.info(`No jobs found for "${tag}"`);
+                          setSearchResults([]);
+                        } else {
+                          setSearchResults(results);
+                          setIsSearchMode(true);
+                          toast.success(`Found ${results.length} jobs for "${tag}"`);
+                          setTimeout(() => {
+                            document.getElementById('search-results')?.scrollIntoView({ behavior: 'smooth' });
+                          }, 100);
+                        }
+                      } catch (error) {
+                        toast.error('Failed to search jobs');
+                      } finally {
+                        setSearching(false);
+                      }
+                    }}
+                    className="bg-white/20 hover:bg-white/30 px-4 py-1 rounded-full text-sm transition-all"
+                  >
                     {tag}
                   </button>
                 ))}
@@ -367,6 +451,102 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Search Results Section */}
+      {isSearchMode && (
+        <section id="search-results" className="py-16 bg-gradient-to-b from-purple-50 to-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-4xl font-bold text-slate-800 mb-2">
+                  Search Results for "{searchQuery}"
+                </h2>
+                <p className="text-slate-600 text-lg">
+                  {searchResults.length} {searchResults.length === 1 ? 'job' : 'jobs'} found
+                </p>
+              </div>
+              <button
+                onClick={clearSearch}
+                className="flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg transition-all font-medium"
+              >
+                <X size={20} />
+                Clear Search
+              </button>
+            </div>
+
+            {searchResults.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-6">
+                {searchResults.map((job, index) => (
+                  <div key={job.jobId || index} className="bg-white rounded-2xl p-6 border-2 border-purple-200 hover:shadow-xl transition-all hover:border-[#8C00FF]">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="font-bold text-slate-800 text-xl">{job.title}</h3>
+                      <span className="bg-green-50 text-green-600 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ml-2">
+                        {formatDate(job.postedDate)}
+                      </span>
+                    </div>
+                    
+                    <p className="text-slate-600 mb-4 line-clamp-2">{job.description}</p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {(job.requiredSkills || []).slice(0, 4).map((skill: string, i: number) => (
+                        <span key={i} className="bg-purple-50 text-purple-700 px-3 py-1 rounded-lg text-sm font-medium">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
+                      <div>
+                        <div className="text-slate-500 mb-1">Budget</div>
+                        <div className="font-semibold text-[#8C00FF]">{formatBudget(job.payAmount)}</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-500 mb-1">Duration</div>
+                        <div className="font-semibold text-slate-800">{job.durationDays} days</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-500 mb-1">Location</div>
+                        <div className="font-semibold text-slate-800 truncate">{job.location}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={() => navigate(`/student/jobs/${job.jobId}`)}
+                        className="flex-1 bg-[#8C00FF] text-white py-3 rounded-lg hover:bg-[#7000CC] transition-all font-medium flex items-center justify-center group"
+                      >
+                        View Details
+                        <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
+                      </button>
+                      <button 
+                        onClick={() => navigate('/login')}
+                        className="px-6 bg-purple-50 text-[#8C00FF] py-3 rounded-lg hover:bg-purple-100 transition-all font-medium"
+                      >
+                        Apply Now
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-slate-300">
+                <Search className="mx-auto mb-4 text-slate-400" size={64} />
+                <h3 className="text-2xl font-bold text-slate-700 mb-2">No jobs found</h3>
+                <p className="text-slate-500 mb-6">
+                  We couldn't find any jobs matching "{searchQuery}". Try different keywords or browse all jobs.
+                </p>
+                <button
+                  onClick={() => navigate('/student/jobs')}
+                  className="inline-flex items-center bg-[#8C00FF] text-white px-8 py-3 rounded-full hover:bg-[#7000CC] transition-all font-medium"
+                >
+                  Browse All Jobs
+                  <ArrowRight className="ml-2" size={20} />
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Featured Jobs Section */}
       <section className="py-16">

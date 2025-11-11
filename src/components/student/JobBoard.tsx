@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Search,
   Filter,
@@ -35,6 +35,7 @@ interface FilterState {
 
 const JobBoard: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuthStore();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,8 +43,12 @@ const JobBoard: React.FC = () => {
   const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
   const [skillInput, setSkillInput] = useState('');
   
+  // Check if we have search results from home page
+  const searchResults = location.state?.searchResults;
+  const initialSearchTerm = location.state?.searchTerm || '';
+  
   const [filters, setFilters] = useState<FilterState>({
-    searchTerm: '',
+    searchTerm: initialSearchTerm,
     location: '',
     categoryId: '',
     jobTypes: [],
@@ -67,28 +72,32 @@ const JobBoard: React.FC = () => {
     }
 
     loadSavedJobs();
-    searchJobs();
-  }, [user, navigate]);
+    
+    // If we have search results from home page, use them
+    if (searchResults && searchResults.length > 0) {
+      setJobs(searchResults);
+      setLoading(false);
+      toast.success(`Found ${searchResults.length} jobs matching "${initialSearchTerm}"`);
+    } else {
+      searchJobs();
+    }
+  }, [user, navigate, searchResults]);
 
   const searchJobs = async () => {
     try {
       setLoading(true);
       
-      // Fetch all active jobs from backend
-      const response = await jobService.getActiveJobs();
-      let filteredData = response;
-
-      // Apply client-side filters
-      // Filter by search term
+      let filteredData: Job[];
+      
+      // If there's a search term, use the search API
       if (filters.searchTerm.trim()) {
-        const searchLower = filters.searchTerm.toLowerCase();
-        filteredData = filteredData.filter(job =>
-          job.title.toLowerCase().includes(searchLower) ||
-          job.description.toLowerCase().includes(searchLower) ||
-          job.requiredSkills.some(skill => skill.toLowerCase().includes(searchLower))
-        );
+        filteredData = await jobService.searchJobsByKeyword(filters.searchTerm);
+      } else {
+        // Otherwise fetch all active jobs
+        filteredData = await jobService.getActiveJobs();
       }
 
+      // Apply additional client-side filters
       // Filter by location
       if (filters.location.trim()) {
         filteredData = filteredData.filter(job =>

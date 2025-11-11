@@ -16,7 +16,8 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useDashboardData } from '../../services/dashboardService';
-import { notificationService } from '../../services';
+import { notificationService, employerService } from '../../services';
+import type { EmployerStats } from '../../services/employerService';
 import { toast } from 'sonner';
 import type { Job } from '../../types';
 import PeerPayLogo from '../../assets/images/PeerPayLogo.png';
@@ -24,14 +25,33 @@ import PeerPayLogo from '../../assets/images/PeerPayLogo.png';
 const EmployerDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  const { data: dashboardData, loading, refetch } = useDashboardData(user?.userId || '', 'Employer');
+  const { data: dashboardData, loading } = useDashboardData(user?.userId || '', 'Employer');
   const [unreadCount, setUnreadCount] = useState(0);
+  const [stats, setStats] = useState<EmployerStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
     if (!user) {
       navigate('/login');
       return;
     }
+
+    // Fetch employer stats
+    const fetchEmployerStats = async () => {
+      try {
+        setStatsLoading(true);
+        // First get employer to get employerId
+        const employer = await employerService.getEmployerByUserId(user.userId);
+        // Then get stats
+        const employerStats = await employerService.getEmployerStats(employer.employerId);
+        setStats(employerStats);
+      } catch (error) {
+        console.error('Failed to fetch employer stats:', error);
+        toast.error('Failed to load statistics');
+      } finally {
+        setStatsLoading(false);
+      }
+    };
 
     // Fetch unread notifications count
     const fetchUnreadCount = async () => {
@@ -43,6 +63,7 @@ const EmployerDashboard: React.FC = () => {
       }
     };
 
+    fetchEmployerStats();
     fetchUnreadCount();
   }, [user, navigate]);
 
@@ -65,7 +86,7 @@ const EmployerDashboard: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading || statsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -141,7 +162,7 @@ const EmployerDashboard: React.FC = () => {
               <div>
                 <p className="text-sm text-gray-600">Total Jobs</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {dashboardData?.myJobs?.length || 0}
+                  {stats?.totalJobs || 0}
                 </p>
               </div>
               <Briefcase className="w-10 h-10 text-blue-600" />
@@ -153,7 +174,7 @@ const EmployerDashboard: React.FC = () => {
               <div>
                 <p className="text-sm text-gray-600">Active Jobs</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {dashboardData?.myJobs?.filter((job: Job) => job.status === 'Active').length || 0}
+                  {stats?.activeJobs || 0}
                 </p>
               </div>
               <TrendingUp className="w-10 h-10 text-green-600" />
@@ -165,7 +186,7 @@ const EmployerDashboard: React.FC = () => {
               <div>
                 <p className="text-sm text-gray-600">Total Applicants</p>
                 <p className="text-2xl font-bold text-purple-600">
-                  {dashboardData?.myJobs?.reduce((acc: number, job: Job) => acc + (job.applicationCount || 0), 0) || 0}
+                  {stats?.totalApplicants || 0}
                 </p>
               </div>
               <Users className="w-10 h-10 text-purple-600" />
@@ -177,7 +198,7 @@ const EmployerDashboard: React.FC = () => {
               <div>
                 <p className="text-sm text-gray-600">Rating</p>
                 <p className="text-2xl font-bold text-orange-600">
-                  {dashboardData?.ratings?.data?.[0]?.averageRating?.toFixed(1) || 'N/A'}
+                  {stats?.averageRating ? stats.averageRating.toFixed(1) : 'N/A'}
                 </p>
               </div>
               <Star className="w-10 h-10 text-orange-600" />
