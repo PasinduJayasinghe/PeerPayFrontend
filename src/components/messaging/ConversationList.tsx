@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import messageService from '../../services/messageService';
 import './ConversationList.css';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://localhost:7255/api';
-
-interface Conversation {
+interface ConversationDto {
   conversationId: string;
   participant1Id: string;
-  participant2Id: string;
   participant1Name: string;
+  participant2Id: string;
   participant2Name: string;
-  lastMessageContent?: string;
-  lastMessageAt?: string;
+  jobId: string;
+  jobTitle: string;
+  lastMessageAt: string;
+  isActive: boolean;
+  lastMessage: {
+    messageId: string;
+    content: string;
+    senderId: string;
+    timestamp: string;
+  } | null;
   unreadCount: number;
-  createdAt: string;
 }
 
 interface ConversationListProps {
@@ -23,7 +28,7 @@ interface ConversationListProps {
 }
 
 const ConversationList: React.FC<ConversationListProps> = ({ currentUserId, userType }) => {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [conversations, setConversations] = useState<ConversationDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -34,73 +39,28 @@ const ConversationList: React.FC<ConversationListProps> = ({ currentUserId, user
 
   const fetchConversations = async () => {
     try {
-      // FOR DEMO VIDEO: Mock conversation data
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const mockConversations: Conversation[] = [
-        {
-          conversationId: 'conv-1',
-          participant1Id: currentUserId,
-          participant2Id: userType === 'student' ? 'emp-101' : 'stu-201',
-          participant1Name: 'You',
-          participant2Name: userType === 'student' ? 'Tech Solutions Inc.' : 'John Smith',
-          lastMessageContent: userType === 'student' 
-            ? 'When can you start the project?' 
-            : 'I can start immediately. The project looks interesting!',
-          lastMessageAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-          unreadCount: 2,
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-        },
-        {
-          conversationId: 'conv-2',
-          participant1Id: currentUserId,
-          participant2Id: userType === 'student' ? 'emp-102' : 'stu-202',
-          participant1Name: 'You',
-          participant2Name: userType === 'student' ? 'Creative Agency' : 'Sarah Johnson',
-          lastMessageContent: userType === 'student'
-            ? 'Thanks for applying! Let me review your portfolio.'
-            : 'I have 3 years of experience in this field.',
-          lastMessageAt: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
-          unreadCount: 0,
-          createdAt: new Date(Date.now() - 172800000).toISOString(),
-        },
-        {
-          conversationId: 'conv-3',
-          participant1Id: currentUserId,
-          participant2Id: userType === 'student' ? 'emp-103' : 'stu-203',
-          participant1Name: 'You',
-          participant2Name: userType === 'student' ? 'Digital Marketing Co.' : 'Mike Chen',
-          lastMessageContent: userType === 'student'
-            ? 'The deadline is flexible, we can discuss.'
-            : 'What is the project timeline?',
-          lastMessageAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-          unreadCount: 1,
-          createdAt: new Date(Date.now() - 259200000).toISOString(),
-        },
-      ];
-      
-      setConversations(mockConversations);
-      
-      // Original API call (commented for demo):
-      // const response = await axios.get(`${API_BASE_URL}/conversation/user/${currentUserId}`);
-      // setConversations(response.data);
+      setLoading(true);
+      const data = await messageService.getUserConversations(currentUserId);
+      setConversations(data);
+      setError('');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load conversations');
+      console.error('Failed to load conversations:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to load conversations');
     } finally {
       setLoading(false);
     }
   };
 
-  const getOtherParticipantName = (conv: Conversation) => {
-    return conv.participant1Id === currentUserId ? conv.participant2Name : conv.participant1Name;
-  };
-
-  const getOtherParticipantId = (conv: Conversation) => {
-    return conv.participant1Id === currentUserId ? conv.participant2Id : conv.participant1Id;
-  };
-
-  const handleConversationClick = (conversationId: string, otherUserId: string) => {
-    navigate(`/messages/${conversationId}`, { state: { otherUserId } });
+  const handleConversationClick = (conv: ConversationDto) => {
+    const otherUserId = conv.participant1Id === currentUserId ? conv.participant2Id : conv.participant1Id;
+    const otherUserName = conv.participant1Id === currentUserId ? conv.participant2Name : conv.participant1Name;
+    navigate(`/messages/${conv.conversationId}`, { 
+      state: { 
+        otherUserId,
+        otherUserName,
+        jobTitle: conv.jobTitle
+      } 
+    });
   };
 
   const formatTime = (dateString?: string) => {
@@ -147,31 +107,42 @@ const ConversationList: React.FC<ConversationListProps> = ({ currentUserId, user
         </div>
       ) : (
         <div className="conversations-list">
-          {conversations.map((conv) => (
-            <div
-              key={conv.conversationId}
-              className={`conversation-item ${conv.unreadCount > 0 ? 'unread' : ''}`}
-              onClick={() => handleConversationClick(conv.conversationId, getOtherParticipantId(conv))}
-            >
-              <div className="conversation-avatar">
-                {getOtherParticipantName(conv).charAt(0).toUpperCase()}
-              </div>
-              <div className="conversation-content">
-                <div className="conversation-top">
-                  <h3 className="conversation-name">{getOtherParticipantName(conv)}</h3>
-                  <span className="conversation-time">{formatTime(conv.lastMessageAt)}</span>
+          {conversations.map((conv) => {
+            const otherParticipantName = conv.participant1Id === currentUserId 
+              ? conv.participant2Name 
+              : conv.participant1Name;
+            
+            return (
+              <div
+                key={conv.conversationId}
+                className={`conversation-item ${conv.unreadCount > 0 ? 'unread' : ''}`}
+                onClick={() => handleConversationClick(conv)}
+              >
+                <div className="conversation-avatar">
+                  {otherParticipantName.charAt(0).toUpperCase()}
                 </div>
-                <div className="conversation-bottom">
-                  <p className="conversation-preview">
-                    {conv.lastMessageContent || 'No messages yet'}
-                  </p>
-                  {conv.unreadCount > 0 && (
-                    <span className="unread-badge">{conv.unreadCount}</span>
+                <div className="conversation-content">
+                  <div className="conversation-top">
+                    <h3 className="conversation-name">{otherParticipantName}</h3>
+                    <span className="conversation-time">{formatTime(conv.lastMessageAt)}</span>
+                  </div>
+                  <div className="conversation-bottom">
+                    <p className="conversation-preview">
+                      {conv.lastMessage?.content || 'No messages yet'}
+                    </p>
+                    {conv.unreadCount > 0 && (
+                      <span className="unread-badge">{conv.unreadCount}</span>
+                    )}
+                  </div>
+                  {conv.jobTitle && (
+                    <div className="conversation-job">
+                      <span>💼 {conv.jobTitle}</span>
+                    </div>
                   )}
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

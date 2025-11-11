@@ -3,7 +3,6 @@ import api from './api';
 import type { 
   Message, 
   Conversation,
-  PaginatedResponse,
   ApiResponse 
 } from '../types';
 
@@ -19,20 +18,6 @@ interface CreateConversationDto {
   jobId?: string;
 }
 
-interface MessageSearchDto {
-  conversationId: string;
-  query: string;
-  page?: number;
-  pageSize?: number;
-}
-
-interface MessageListParams {
-  page?: number;
-  pageSize?: number;
-  before?: string; // Date ISO string
-  after?: string;  // Date ISO string
-}
-
 class MessageService {
   private readonly BASE_URL = '/message';
   private readonly CONVERSATION_URL = '/conversation';
@@ -43,9 +28,9 @@ class MessageService {
    * POST /api/message
    * Send a new message
    */
-  async sendMessage(messageData: SendMessageDto): Promise<Message> {
+  async sendMessage(messageData: SendMessageDto): Promise<any> {
     try {
-      const response = await api.post<Message>(`${this.BASE_URL}`, messageData);
+      const response = await api.post<any>(`${this.BASE_URL}`, messageData);
       return response.data;
     } catch (error) {
       console.error('Send message error:', error);
@@ -85,9 +70,13 @@ class MessageService {
    * PUT /api/message/conversation/{conversationId}/read
    * Mark all messages in conversation as read
    */
-  async markConversationAsRead(conversationId: string): Promise<ApiResponse<boolean>> {
+  async markConversationAsRead(conversationId: string, userId: string): Promise<ApiResponse<boolean>> {
     try {
-      const response = await api.put<ApiResponse<boolean>>(`${this.BASE_URL}/conversation/${conversationId}/read`);
+      const response = await api.put<ApiResponse<boolean>>(
+        `${this.BASE_URL}/conversation/${conversationId}/read`,
+        null,
+        { params: { userId } }
+      );
       return response.data;
     } catch (error) {
       console.error('Mark conversation as read error:', error);
@@ -113,15 +102,16 @@ class MessageService {
    * GET /api/message/conversation/{conversationId}
    * Get messages in a conversation
    */
-  async getConversationMessages(conversationId: string, params: MessageListParams = {}): Promise<PaginatedResponse<Message>> {
+  async getConversationMessages(
+    conversationId: string, 
+    userId: string,
+    pageNumber: number = 1,
+    pageSize: number = 50
+  ): Promise<any> {
     try {
-      const queryParams = new URLSearchParams();
-      if (params.page) queryParams.append('page', params.page.toString());
-      if (params.pageSize) queryParams.append('pageSize', params.pageSize.toString());
-      if (params.before) queryParams.append('before', params.before);
-      if (params.after) queryParams.append('after', params.after);
-
-      const response = await api.get<PaginatedResponse<Message>>(`${this.BASE_URL}/conversation/${conversationId}?${queryParams}`);
+      const response = await api.get(`${this.BASE_URL}/conversation/${conversationId}`, {
+        params: { userId, pageNumber, pageSize }
+      });
       return response.data;
     } catch (error) {
       console.error('Get conversation messages error:', error);
@@ -130,12 +120,12 @@ class MessageService {
   }
 
   /**
-   * GET /api/message/user/{userId}/unread
+   * GET /api/message/unread/{userId}
    * Get unread messages for user
    */
   async getUnreadMessages(userId: string): Promise<Message[]> {
     try {
-      const response = await api.get<Message[]>(`${this.BASE_URL}/user/${userId}/unread`);
+      const response = await api.get<Message[]>(`${this.BASE_URL}/unread/${userId}`);
       return response.data;
     } catch (error) {
       console.error('Get unread messages error:', error);
@@ -144,12 +134,14 @@ class MessageService {
   }
 
   /**
-   * POST /api/message/search
+   * GET /api/message/search
    * Search messages in conversation
    */
-  async searchMessages(searchData: MessageSearchDto): Promise<PaginatedResponse<Message>> {
+  async searchMessages(conversationId: string, searchTerm: string): Promise<any> {
     try {
-      const response = await api.post<PaginatedResponse<Message>>(`${this.BASE_URL}/search`, searchData);
+      const response = await api.get(`${this.BASE_URL}/search`, {
+        params: { conversationId, searchTerm }
+      });
       return response.data;
     } catch (error) {
       console.error('Search messages error:', error);
@@ -191,9 +183,9 @@ class MessageService {
    * GET /api/conversation/user/{userId}
    * Get user conversations
    */
-  async getUserConversations(userId: string): Promise<Conversation[]> {
+  async getUserConversations(userId: string): Promise<any[]> {
     try {
-      const response = await api.get<Conversation[]>(`${this.CONVERSATION_URL}/user/${userId}`);
+      const response = await api.get<any[]>(`${this.CONVERSATION_URL}/user/${userId}`);
       return response.data;
     } catch (error) {
       console.error('Get user conversations error:', error);

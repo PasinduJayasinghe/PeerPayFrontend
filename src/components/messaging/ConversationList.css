@@ -165,6 +165,21 @@
   text-align: center;
 }
 
+.conversation-job {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.conversation-job span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
   .conversations-container {
     padding: 12px;
