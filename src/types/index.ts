@@ -1,7 +1,7 @@
 // Core type definitions matching backend models
 
 export type UserType = 'Student' | 'Employer' | 'Admin';
-export type UserStatus = 'Active' | 'Inactive' | 'Suspended' | 'Banned';
+export type UserStatus = 'Active' | 'Inactive' | 'Suspended' | 'PendingVerification';
 
 export interface User {
   userId: string;
@@ -43,6 +43,14 @@ export interface Employer {
   user?: User;
 }
 
+export interface Admin {
+  adminId: string;
+  userId: string;
+  role: string;
+  permissions: string[];
+  user?: User;
+}
+
 export interface Profile {
   profileId: string;
   userId: string;
@@ -50,6 +58,25 @@ export interface Profile {
   address?: string;
   profilePictureUrl?: string;
   documents?: string[];
+}
+
+export interface StudentSkill {
+  skillId: string;
+  studentId: string;
+  skillName: string;
+  proficiencyLevel: ProficiencyLevel;
+}
+
+export type ProficiencyLevel = 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+
+export interface JobCategory {
+  categoryId: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+  jobCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Auth DTOs
@@ -101,7 +128,7 @@ export interface UserResponseDto {
 
 // Job related types
 export type JobStatus = 'Active' | 'Closed' | 'Completed' | 'Cancelled';
-export type ApplicationStatus = 'Pending' | 'Submitted' | 'UnderReview' | 'Shortlisted' | 'Accepted' | 'Selected' | 'Rejected' | 'Withdrawn';
+export type ApplicationStatus = 'Submitted' | 'UnderReview' | 'Shortlisted' | 'Selected' | 'Rejected' | 'Withdrawn';
 export type PayType = 'Hourly' | 'Daily' | 'Weekly' | 'Monthly' | 'Fixed';
 export type JobType = 'FullTime' | 'PartTime' | 'ProjectBased' | 'Freelance';
 
@@ -109,13 +136,14 @@ export interface Job {
   jobId: string;
   id: string; // Add alias for convenience
   employerId: string;
-  categoryId: string;
+  categoryId?: string;
   title: string;
   description: string;
   payAmount: number;
   payType: PayType;
   durationDays: number;
   requiredSkills: string[];
+  attachments?: string[];
   deadline: string;
   status: JobStatus;
   location: string;
@@ -138,11 +166,12 @@ export interface JobApplication {
   university?: string;
   course?: string;
   yearOfStudy?: number;
-  appliedAt: string;
+  appliedDate: string;
   status: ApplicationStatus;
   coverLetter: string;
   attachments?: string[];
   statusUpdatedAt?: string;
+  updatedBy?: string;
   employerNotes?: string;
 }
 
@@ -169,25 +198,32 @@ export interface Notification {
 }
 
 // Message types
+export type MessageStatus = 'Sent' | 'Delivered' | 'Read';
+
 export interface Message {
   messageId: string;
   conversationId: string;
   senderId: string;
   content: string;
-  isRead: boolean;
-  sentAt: string;
   attachments?: string[];
+  timestamp: string;
+  status: MessageStatus;
+  isRead: boolean;
+  readAt?: string;
 }
 
 export interface Conversation {
   conversationId: string;
-  participantIds: string[];
+  participant1Id: string;
+  participant2Id: string;
   jobId?: string;
-  createdAt: string;
   lastMessageAt: string;
+  isActive: boolean;
 }
 
 // Rating types
+export type RatingType = 'StudentToEmployer' | 'EmployerToStudent';
+
 export interface Rating {
   ratingId: string;
   jobId: string;
@@ -195,9 +231,10 @@ export interface Rating {
   ratedUserId: string;
   ratingValue: number;
   review?: string;
+  ratingType: RatingType;
   isPublic: boolean;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface RatingStats {
@@ -213,8 +250,10 @@ export interface RatingStats {
 }
 
 // Payment types
-export type PaymentStatus = 'Pending' | 'Escrowed' | 'Released' | 'Completed' | 'Failed' | 'Refunded' | 'Disputed';
-export type EscrowStatus = 'Funded' | 'Held' | 'Released' | 'Refunded' | 'Disputed';
+export type PaymentStatus = 'Pending' | 'Processing' | 'Completed' | 'Failed' | 'Refunded';
+export type PaymentMethod = 'BankTransfer' | 'DigitalWallet' | 'CreditCard' | 'UPI';
+export type TransactionType = 'PaymentReceived' | 'Withdrawal' | 'Refund' | 'FeeDeduction';
+export type TransactionStatus = 'Success' | 'Pending' | 'Failed';
 
 export interface Payment {
   paymentId: string;
@@ -222,12 +261,13 @@ export interface Payment {
   employerId: string;
   studentId: string;
   amount: number;
-  currency: string;
   status: PaymentStatus;
-  transactionId: string;
-  gatewayResponse?: string;
-  createdAt: string;
+  createdDate: string;
   completedDate?: string;
+  transactionId: string;
+  paymentMethod: PaymentMethod;
+  gatewayResponse?: string;
+  notes?: string;
 }
 
 export interface PaymentIntent {
@@ -269,13 +309,181 @@ export interface WalletBalance {
 export interface Transaction {
   transactionId: string;
   userId: string;
-  type: 'Credit' | 'Debit' | 'Escrow' | 'Release' | 'Refund' | 'Withdrawal';
+  paymentId?: string;
+  transactionType: TransactionType;
   amount: number;
-  balance: number;
+  status: TransactionStatus;
   description: string;
-  relatedEntityId?: string;
-  relatedEntityType?: 'Job' | 'Payment' | 'Escrow';
+  metadata?: string;
+  timestamp: string;
+}
+
+export interface Earnings {
+  earningsId: string;
+  studentId: string;
+  totalEarnings: number;
+  availableBalance: number;
+  withdrawnAmount: number;
+  pendingAmount: number;
+  lastUpdated: string;
+}
+
+export type WithdrawalStatus = 'Pending' | 'Processing' | 'Completed' | 'Rejected';
+
+export interface WithdrawalRequest {
+  withdrawalId: string;
+  studentId: string;
+  amount: number;
+  status: WithdrawalStatus;
+  bankDetails: string;
+  requestedDate: string;
+  processedDate?: string;
+  processedBy?: string;
+  notes?: string;
+}
+
+export interface Notification {
+  notificationId: string;
+  userId: string;
+  title: string;
+  content: string;
+  type: NotificationType;
+  isRead: boolean;
   createdAt: string;
+  readAt?: string;
+  actionUrl?: string;
+  metadata?: string;
+  expiresAt?: string;
+}
+
+export type ReportType = 'UserGrowth' | 'JobTrends' | 'PaymentSummary' | 'UsageAnalytics';
+
+export interface Report {
+  reportId: string;
+  generatedBy: string;
+  reportType: ReportType;
+  parameters?: string;
+  data?: string;
+  fileUrl?: string;
+  generatedDate: string;
+  expiresAt?: string;
+}
+
+export type DataType = 'String' | 'Integer' | 'Boolean' | 'Decimal' | 'DateTime' | 'Json';
+
+export interface SystemConfig {
+  configId: string;
+  configKey: string;
+  configValue: string;
+  description?: string;
+  dataType: DataType;
+  isActive: boolean;
+  lastModified: string;
+  modifiedBy?: string;
+}
+
+export type AuditAction = 'Create' | 'Update' | 'Delete' | 'Login' | 'Logout';
+
+export interface AuditLog {
+  auditId: string;
+  userId: string;
+  entityType: string;
+  entityId: string;
+  action: AuditAction;
+  oldValues?: string;
+  newValues?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  timestamp: string;
+}
+
+export interface FileUpload {
+  fileId: string;
+  userId: string;
+  entityType: string;
+  entityId: string;
+  originalName: string;
+  filePath: string;
+  fileType: string;
+  fileSize: number;
+  hashValue?: string;
+  uploadedAt: string;
+  expiresAt?: string;
+}
+
+export interface UserSession {
+  sessionId: string;
+  userId: string;
+  deviceType?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  lastAccessed: string;
+  expiresAt: string;
+  isActive: boolean;
+}
+
+export type OTPPurpose = 'Registration' | 'Login' | 'PasswordReset' | 'PhoneVerification' | 'EmailVerification';
+
+export interface OTPVerification {
+  otpId: string;
+  userId: string;
+  otpCode: string;
+  purpose: OTPPurpose;
+  contactMethod: string;
+  isUsed: boolean;
+  expiresAt: string;
+  attempts: number;
+}
+
+// Keep existing custom frontend types for backward compatibility
+export interface PaymentIntent {
+  paymentIntentId: string;
+  clientSecret: string;
+  amount: number;
+  currency: string;
+}
+
+export type EscrowStatus = 'Funded' | 'Held' | 'Released' | 'Refunded' | 'Disputed';
+
+export interface EscrowWallet {
+  escrowId: string;
+  jobId: string;
+  jobTitle?: string;
+  employerId: string;
+  employerName?: string;
+  studentId: string;
+  studentName?: string;
+  amount: number;
+  platformFee: number;
+  studentAmount: number;
+  status: EscrowStatus;
+  fundedAt: string;
+  releasedAt?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WalletBalance {
+  userId: string;
+  availableBalance: number;
+  escrowedBalance: number;
+  totalEarnings: number;
+  totalSpent: number;
+  currency: string;
+  lastUpdated: string;
+}
+
+export interface RatingStats {
+  averageRating: number;
+  totalRatings: number;
+  distribution: {
+    fiveStar: number;
+    fourStar: number;
+    threeStar: number;
+    twoStar: number;
+    oneStar: number;
+  };
 }
 
 // API Response wrapper

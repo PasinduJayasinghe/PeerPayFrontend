@@ -44,24 +44,10 @@ const PostJob: React.FC = () => {
   });
 
   useEffect(() => {
-    // FOR DEMO VIDEO: Use hardcoded categories
-    const hardcodedCategories: JobCategory[] = [
-      { categoryId: '1', name: 'Web Development', description: 'Web development jobs', isActive: true, createdAt: '', updatedAt: '' },
-      { categoryId: '2', name: 'Mobile App Development', description: 'Mobile app jobs', isActive: true, createdAt: '', updatedAt: '' },
-      { categoryId: '3', name: 'Graphic Design', description: 'Design jobs', isActive: true, createdAt: '', updatedAt: '' },
-      { categoryId: '4', name: 'Content Writing', description: 'Writing jobs', isActive: true, createdAt: '', updatedAt: '' },
-      { categoryId: '5', name: 'Digital Marketing', description: 'Marketing jobs', isActive: true, createdAt: '', updatedAt: '' },
-      { categoryId: '6', name: 'Data Entry', description: 'Data entry jobs', isActive: true, createdAt: '', updatedAt: '' },
-      { categoryId: '7', name: 'Video Editing', description: 'Video editing jobs', isActive: true, createdAt: '', updatedAt: '' },
-      { categoryId: '8', name: 'UI/UX Design', description: 'UI/UX design jobs', isActive: true, createdAt: '', updatedAt: '' },
-    ];
-    setCategories(hardcodedCategories);
-    setLoadingCategories(false);
+    fetchCategories();
   }, []);
 
   const fetchCategories = async () => {
-    // Disabled for demo video
-    /*
     try {
       setLoadingCategories(true);
       const data = await jobCategoryService.getAllCategories();
@@ -86,7 +72,6 @@ const PostJob: React.FC = () => {
     } finally {
       setLoadingCategories(false);
     }
-    */
   };
 
   const handleInputChange = (
@@ -186,11 +171,7 @@ const PostJob: React.FC = () => {
 
       console.log('Creating job with data:', jobData);
       
-      // FOR DEMO VIDEO: Skip API call and show success message directly
-      // await jobService.createJob(jobData);
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await jobService.createJob(jobData);
 
       toast.success('Job posted successfully!');
       navigate('/employer/dashboard');

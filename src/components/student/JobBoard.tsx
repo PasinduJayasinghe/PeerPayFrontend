@@ -74,167 +74,11 @@ const JobBoard: React.FC = () => {
     try {
       setLoading(true);
       
-      // FOR DEMO VIDEO: Mock job data
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const mockJobs: Job[] = [
-        {
-          jobId: 'job-1',
-          id: 'job-1',
-          employerId: 'emp-101',
-          categoryId: 'cat-1',
-          title: 'Full Stack Web Developer Needed',
-          description: 'Looking for an experienced full stack developer to build a modern e-commerce platform. Must have experience with React, Node.js, and MongoDB. The project includes user authentication, payment integration, and admin dashboard.',
-          payAmount: 2500,
-          jobType: 'Freelance',
-          payType: 'Fixed',
-          location: 'Remote',
-          requiredSkills: ['React', 'Node.js', 'MongoDB', 'Express', 'TypeScript'],
-          status: 'Active',
-          postedDate: new Date(Date.now() - 3600000 * 24).toISOString(),
-          deadline: new Date(Date.now() + 3600000 * 24 * 14).toISOString(),
-          durationDays: 42,
-          maxApplicants: 10,
-          applicationCount: 5
-        },
-        {
-          jobId: 'job-2',
-          id: 'job-2',
-          employerId: 'emp-102',
-          categoryId: 'cat-2',
-          title: 'Mobile App Developer - iOS & Android',
-          description: 'Need a skilled mobile developer to create a fitness tracking app for both iOS and Android platforms. The app should include workout tracking, nutrition logging, and social features.',
-          payAmount: 3500,
-          jobType: 'Freelance',
-          payType: 'Fixed',
-          location: 'Remote',
-          requiredSkills: ['React Native', 'Firebase', 'Mobile Development', 'UI/UX'],
-          status: 'Active',
-          postedDate: new Date(Date.now() - 3600000 * 48).toISOString(),
-          deadline: new Date(Date.now() + 3600000 * 24 * 21).toISOString(),
-          durationDays: 56,
-          maxApplicants: 8,
-          applicationCount: 8
-        },
-        {
-          jobId: 'job-3',
-          id: 'job-3',
-          employerId: 'emp-103',
-          categoryId: 'cat-3',
-          title: 'UI/UX Designer for Dashboard Redesign',
-          description: 'Seeking a creative UI/UX designer to redesign our analytics dashboard. Should have strong portfolio in data visualization and modern design principles. Figma proficiency required.',
-          payAmount: 1200,
-          jobType: 'Freelance',
-          payType: 'Fixed',
-          location: 'Remote',
-          requiredSkills: ['Figma', 'UI Design', 'UX Research', 'Prototyping'],
-          status: 'Active',
-          postedDate: new Date(Date.now() - 3600000 * 12).toISOString(),
-          deadline: new Date(Date.now() + 3600000 * 24 * 10).toISOString(),
-          durationDays: 21,
-          maxApplicants: 15,
-          applicationCount: 12
-        },
-        {
-          jobId: 'job-4',
-          id: 'job-4',
-          employerId: 'emp-104',
-          categoryId: 'cat-4',
-          title: 'Content Writer - Tech Blog Articles',
-          description: 'Looking for a talented content writer to create engaging blog articles about technology, software development, and digital trends. Must deliver 2 articles per week (1500-2000 words each).',
-          payAmount: 500,
-          jobType: 'PartTime',
-          payType: 'Monthly',
-          location: 'Remote',
-          requiredSkills: ['Content Writing', 'SEO', 'Technical Writing', 'Research'],
-          status: 'Active',
-          postedDate: new Date(Date.now() - 3600000 * 6).toISOString(),
-          deadline: new Date(Date.now() + 3600000 * 24 * 7).toISOString(),
-          durationDays: 90,
-          maxApplicants: 20,
-          applicationCount: 15
-        },
-        {
-          jobId: 'job-5',
-          id: 'job-5',
-          employerId: 'emp-105',
-          categoryId: 'cat-5',
-          title: 'Digital Marketing Specialist - Social Media',
-          description: 'Need an experienced digital marketer to manage our social media presence across Instagram, Facebook, and LinkedIn. Includes content creation, scheduling, analytics, and community engagement.',
-          payAmount: 800,
-          jobType: 'PartTime',
-          payType: 'Monthly',
-          location: 'Remote',
-          requiredSkills: ['Social Media Marketing', 'Content Creation', 'Analytics', 'Copywriting'],
-          status: 'Active',
-          postedDate: new Date(Date.now() - 3600000 * 36).toISOString(),
-          deadline: new Date(Date.now() + 3600000 * 24 * 5).toISOString(),
-          durationDays: 180,
-          maxApplicants: 12,
-          applicationCount: 10
-        },
-        {
-          jobId: 'job-6',
-          id: 'job-6',
-          employerId: 'emp-106',
-          categoryId: 'cat-6',
-          title: 'Data Entry Specialist - Excel & Database',
-          description: 'Looking for detail-oriented data entry specialist to input and organize data from various sources into Excel and our database system. Accuracy is critical.',
-          payAmount: 300,
-          jobType: 'Freelance',
-          payType: 'Fixed',
-          location: 'Remote',
-          requiredSkills: ['Data Entry', 'Excel', 'Attention to Detail', 'Database Management'],
-          status: 'Active',
-          postedDate: new Date(Date.now() - 3600000 * 8).toISOString(),
-          deadline: new Date(Date.now() + 3600000 * 24 * 7).toISOString(),
-          durationDays: 14,
-          maxApplicants: 25,
-          applicationCount: 20
-        },
-        {
-          jobId: 'job-7',
-          id: 'job-7',
-          employerId: 'emp-107',
-          categoryId: 'cat-7',
-          title: 'Video Editor - YouTube Content',
-          description: 'Seeking a creative video editor for our YouTube channel. Need someone who can edit engaging videos with graphics, transitions, and sound effects. Experience with Adobe Premiere or Final Cut Pro required.',
-          payAmount: 150,
-          jobType: 'Freelance',
-          payType: 'Hourly',
-          location: 'Remote',
-          requiredSkills: ['Video Editing', 'Adobe Premiere', 'After Effects', 'Color Grading'],
-          status: 'Active',
-          postedDate: new Date(Date.now() - 3600000 * 18).toISOString(),
-          deadline: new Date(Date.now() + 3600000 * 24 * 14).toISOString(),
-          durationDays: 28,
-          maxApplicants: 10,
-          applicationCount: 7
-        },
-        {
-          jobId: 'job-8',
-          id: 'job-8',
-          employerId: 'emp-108',
-          categoryId: 'cat-8',
-          title: 'Graphic Designer - Brand Identity Package',
-          description: 'Need a talented graphic designer to create a complete brand identity package including logo, color palette, typography, business cards, and social media templates.',
-          payAmount: 900,
-          jobType: 'Freelance',
-          payType: 'Fixed',
-          location: 'Remote',
-          requiredSkills: ['Graphic Design', 'Adobe Illustrator', 'Photoshop', 'Branding'],
-          status: 'Active',
-          postedDate: new Date(Date.now() - 3600000 * 4).toISOString(),
-          deadline: new Date(Date.now() + 3600000 * 24 * 12).toISOString(),
-          durationDays: 21,
-          maxApplicants: 12,
-          applicationCount: 9
-        }
-      ];
-      
-      // Apply client-side filters
-      let filteredData = mockJobs;
+      // Fetch all active jobs from backend
+      const response = await jobService.getActiveJobs();
+      let filteredData = response;
 
+      // Apply client-side filters
       // Filter by search term
       if (filters.searchTerm.trim()) {
         const searchLower = filters.searchTerm.toLowerCase();
@@ -282,10 +126,6 @@ const JobBoard: React.FC = () => {
       }
 
       setJobs(filteredData);
-      
-      // Original API calls (commented for demo):
-      // const response = await jobService.getAllJobs(1, 100);
-      // const searchResponse = await jobService.searchJobs(criteria);
     } catch (error) {
       console.error('Failed to fetch jobs:', error);
       toast.error('Failed to load jobs');

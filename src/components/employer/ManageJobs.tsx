@@ -13,6 +13,7 @@ import {
   Eye
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { jobService, employerService } from '../../services';
 import { toast } from 'sonner';
 import PeerPayLogo from '../../assets/images/PeerPayLogo.png';
 import type { Job } from '../../types';
@@ -24,6 +25,7 @@ const ManageJobs: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('All');
+  const [employerId, setEmployerId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -31,10 +33,11 @@ const ManageJobs: React.FC = () => {
       return;
     }
 
-    fetchJobs();
+    // First fetch the employer ID, then fetch jobs
+    fetchEmployerAndJobs();
   }, [user, navigate]);
 
-  const fetchJobs = async () => {
+  const fetchEmployerAndJobs = async () => {
     try {
       setLoading(true);
       if (!user?.userId) {
@@ -43,7 +46,33 @@ const ManageJobs: React.FC = () => {
         return;
       }
       
-      const response = await jobService.getJobsByEmployer(user.userId);
+      // Get employer data to get employerId
+      const employer = await employerService.getEmployerByUserId(user.userId);
+      console.log('Fetched employer:', employer);
+      setEmployerId(employer.employerId);
+      
+      // Now fetch jobs using employerId
+      const response = await jobService.getJobsByEmployer(employer.employerId);
+      console.log('Fetched employer jobs:', response);
+      setJobs(Array.isArray(response) ? response : []);
+    } catch (error) {
+      console.error('Failed to fetch employer data or jobs:', error);
+      toast.error('Failed to load jobs');
+      setJobs([]); // Set empty array on error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchJobs = async () => {
+    if (!employerId) {
+      console.log('No employerId available yet');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await jobService.getJobsByEmployer(employerId);
       console.log('Fetched employer jobs:', response);
       setJobs(Array.isArray(response) ? response : []);
     } catch (error) {

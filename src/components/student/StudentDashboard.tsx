@@ -23,7 +23,7 @@ import PeerPayLogo from '../../assets/images/PeerPayLogo.png';
 const StudentDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  const { data: dashboardData, loading, refetch } = useDashboardData(user?.id || '', 'Student');
+  const { data: dashboardData, loading, refetch } = useDashboardData(user?.userId || '', 'Student');
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const StudentDashboard: React.FC = () => {
     // Fetch unread notifications count
     const fetchUnreadCount = async () => {
       try {
-        const count = await notificationService.getUnreadCount(user.id);
+        const count = await notificationService.getUnreadCount(user.userId);
         setUnreadCount(count);
       } catch (error) {
         console.error('Failed to fetch unread count:', error);
@@ -248,7 +248,7 @@ const StudentDashboard: React.FC = () => {
                   <div key={app.id} className="flex items-center justify-between">
                     <div className="flex-1">
                       <p className="text-sm font-medium text-gray-900 truncate">Application #{app.id.substring(0, 8)}</p>
-                      <p className="text-xs text-gray-500">{new Date(app.appliedAt).toLocaleDateString()}</p>
+                      <p className="text-xs text-gray-500">{new Date(app.appliedDate).toLocaleDateString()}</p>
                     </div>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getApplicationStatusColor(app.status)}`}>
                       {app.status}

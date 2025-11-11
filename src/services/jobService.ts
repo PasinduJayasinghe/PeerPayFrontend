@@ -187,6 +187,20 @@ class JobService {
     }
   }
 
+  /**
+   * GET /api/job (with Active status filter)
+   * Get all active jobs - convenience method for job board
+   */
+  async getActiveJobs(): Promise<Job[]> {
+    try {
+      const response = await api.get<Job[]>(`${this.BASE_URL}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get active jobs error:', error);
+      throw error;
+    }
+  }
+
   // ============ JOB APPLICATIONS ============
 
   /**
